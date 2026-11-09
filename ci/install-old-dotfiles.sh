@@ -31,14 +31,18 @@ with_time_limit 900 brew install --cask "${apps[@]}"
 
 phase "Launching each app once so it writes its first-run preferences"
 # Open by path: right after install, Launch Services may not know the app names yet.
+# Quit with signals, not osascript: Apple Events wait on a permission prompt
+# that nobody can answer on a CI runner. Preferences go through cfprefsd, which
+# saves them even when the app is killed. Every step is time-limited.
 for path in /Applications/{Ghostty,Rectangle,AltTab,"Alfred 5","Bartender 7","CleanShot X"}.app; do
   name=$(basename "$path" .app)
-  if open -g "$path"; then
+  if with_time_limit 30 open -g "$path"; then
     sleep 10
-    osascript -e "quit app \"$name\"" || true
+    if pgrep -f "$path/Contents/MacOS/" > /dev/null; then running=yes; else running=no; fi
+    pkill -TERM -f "$path/Contents/MacOS/" || true
     sleep 2
-    pkill -9 -f "$path/Contents/MacOS/" || true
-    echo "Launched and quit $name"
+    pkill -KILL -f "$path/Contents/MacOS/" || true
+    echo "Launched $name (still running after 10s: $running), then quit it"
   else
     echo "WARNING: could not launch $path"
   fi
