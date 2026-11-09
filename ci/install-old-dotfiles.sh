@@ -18,6 +18,24 @@ git -C "$repo" checkout --quiet "$OLD_DOTFILES_SHA"
 sudo mkdir -p /usr/local/bin
 sudo chown "$(id -un)" /usr/local/bin
 
+echo "### Installing the Mac apps whose preferences linker.sh imports"
+# Not iTerm2 (replaced by Ghostty) or MeetingBar (a private fork on the work Mac).
+apps=(ghostty rectangle alt-tab alfred bartender cleanshot)
+brew install --cask "${apps[@]}"
+
+echo "### Launching each app once so it writes its first-run preferences"
+for app in Ghostty Rectangle AltTab "Alfred 5" "Bartender 6" "CleanShot X"; do
+  if open -a "$app"; then
+    sleep 10
+    osascript -e "quit app \"$app\"" || pkill -x "$app" || true
+    sleep 2
+    pgrep -x "$app" > /dev/null && pkill -9 -x "$app"
+    echo "Launched and quit $app"
+  else
+    echo "WARNING: could not launch $app"
+  fi
+done
+
 echo "### Installing oh-my-zsh (unattended)"
 RUNZSH=no CHSH=no sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)" "" --unattended
 
