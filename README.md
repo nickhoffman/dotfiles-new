@@ -25,6 +25,17 @@ hanging.
 DOTFILES_PROFILE=devbox sh -c "$(curl -fsLS --retry 5 --retry-all-errors get.chezmoi.io)" -- -b ~/.local/bin init --apply nickhoffman/dotfiles-new
 ```
 
+In a devbox init script, retry it: the chezmoi download inside that script
+doesn't retry on its own, and GitHub sometimes returns HTTP 504. Re-running is
+safe.
+
+```sh
+for attempt in 1 2 3; do
+  DOTFILES_PROFILE=devbox sh -c "$(curl -fsLS --retry 5 --retry-all-errors get.chezmoi.io)" -- -b ~/.local/bin init --apply nickhoffman/dotfiles-new && break
+  sleep 10
+done
+```
+
 **New Mac:** install [Homebrew](https://brew.sh), then:
 
 ```sh

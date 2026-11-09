@@ -8,24 +8,32 @@ here="$(cd "$(dirname "$0")" && pwd)"
 source "$here/assert-lib.sh"
 [[ -t 0 ]] && { echo "Expected no terminal."; exit 1; }
 
+# Like the README: retry the whole one-liner, since the release download inside
+# get.chezmoi.io's script has no retries of its own.
+with_retries() { local i; for i in 1 2 3; do "$@" && return 0; echo "Attempt $i failed; retrying in 10s"; sleep 10; done; return 1; }
+
+echo "== Install chezmoi only"
+with_retries sh -c 'sh -c "$(curl -fsLS --retry 5 --retry-all-errors get.chezmoi.io)" -- -b "$HOME/.local/bin"' < /dev/null
+export PATH="$HOME/.local/bin:$PATH"
+
 echo "== A missing profile fails fast instead of hanging"
 start=$(date +%s)
-out=$(env -u DOTFILES_PROFILE timeout 60 sh -c "$(curl -fsLS --retry 5 --retry-all-errors get.chezmoi.io)" -- -b "$HOME/.local/bin" init --source "$src" 2>&1 < /dev/null); rc=$?
+out=$(env -u DOTFILES_PROFILE timeout 60 chezmoi init --source "$src" 2>&1 < /dev/null); rc=$?
+echo "$out"
 check "chezmoi init without a profile fails" test "$rc" -ne 0 -a "$rc" -ne 124
 check "the error names DOTFILES_PROFILE" grep -q DOTFILES_PROFILE <<< "$out"
 check "it fails within 30 seconds" test $(( $(date +%s) - start )) -lt 30
-rm -rf "$HOME/.config/chezmoi"
+rm -rf "$HOME/.config/chezmoi" "$HOME/.local/bin/chezmoi"
 
 echo "== Bootstrap"
 start=$(date +%s)
 if [[ $mode == github ]]; then
   # The exact one-liner from the README, against the repo on GitHub.
-  DOTFILES_PROFILE=devbox sh -c "$(curl -fsLS --retry 5 --retry-all-errors get.chezmoi.io)" -- -b ~/.local/bin init --apply nickhoffman/dotfiles-new < /dev/null; rc=$?
+  DOTFILES_PROFILE=devbox with_retries sh -c 'sh -c "$(curl -fsLS --retry 5 --retry-all-errors get.chezmoi.io)" -- -b ~/.local/bin init --apply nickhoffman/dotfiles-new' < /dev/null; rc=$?
 else
-  DOTFILES_PROFILE=devbox sh -c "$(curl -fsLS --retry 5 --retry-all-errors get.chezmoi.io)" -- -b ~/.local/bin init --apply --source "$src" < /dev/null; rc=$?
+  DOTFILES_PROFILE=devbox with_retries sh -c 'sh -c "$(curl -fsLS --retry 5 --retry-all-errors get.chezmoi.io)" -- -b ~/.local/bin init --apply --source "$0"' "$src" < /dev/null; rc=$?
 fi
 echo "Bootstrap took $(( $(date +%s) - start ))s"
-export PATH="$HOME/.local/bin:$PATH"
 check "bootstrap exits 0" test "$rc" -eq 0
 check "chezmoi verify passes" chezmoi verify
 check "a second chezmoi apply changes nothing" idempotent_apply
