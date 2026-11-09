@@ -35,6 +35,11 @@ jobs:
           ci/snapshot.sh "$RUNNER_TEMP/baseline"
           for f in home-entries.txt zsh-startup.txt tools.txt; do echo "== $f"; cat "$RUNNER_TEMP/baseline/$f"; done
 
+      - name: Test the Mac inventory script
+        if: always()
+        timeout-minutes: 5
+        run: ci/test-mac-inventory.sh "$RUNNER_TEMP/baseline"
+
       - uses: actions/upload-artifact@v4
         if: always()
         with:
