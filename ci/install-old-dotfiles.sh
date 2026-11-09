@@ -31,21 +31,26 @@ with_time_limit 900 brew install --cask "${apps[@]}"
 
 phase "Launching each app once so it writes its first-run preferences"
 # Open by path: right after install, Launch Services may not know the app names yet.
-# Quit with signals, not osascript: Apple Events wait on a permission prompt
-# that nobody can answer on a CI runner. Preferences go through cfprefsd, which
-# saves them even when the app is killed. Every step is time-limited.
+# Clear the quarantine mark first, as clicking "Open" in Gatekeeper's first-launch
+# prompt does; otherwise `open` waits on that prompt. Quit with signals, not
+# osascript, which can wait on an Apple Events permission prompt. Preferences go
+# through cfprefsd, which saves them even when the app is killed.
+launch_failures=()
 for path in /Applications/{Ghostty,Rectangle,AltTab,"Alfred 5","Bartender 7","CleanShot X"}.app; do
   name=$(basename "$path" .app)
+  xattr -dr com.apple.quarantine "$path" 2>/dev/null || true
   if with_time_limit 30 open -g "$path"; then
     sleep 10
     if pgrep -f "$path/Contents/MacOS/" > /dev/null; then running=yes; else running=no; fi
-    pkill -TERM -f "$path/Contents/MacOS/" || true
-    sleep 2
-    pkill -KILL -f "$path/Contents/MacOS/" || true
-    echo "Launched $name (still running after 10s: $running), then quit it"
+    echo "Launched $name (still running after 10s: $running)"
+    [[ $running == yes ]] || launch_failures+=("$name (exited within 10s)")
   else
-    echo "WARNING: could not launch $path"
+    echo "ERROR: could not launch $path"
+    launch_failures+=("$name (open failed or timed out)")
   fi
+  pkill -TERM -f "$path/Contents/MacOS/" || true
+  sleep 2
+  pkill -KILL -f "$path/Contents/MacOS/" || true
 done
 
 phase "Installing oh-my-zsh (unattended)"
@@ -77,7 +82,10 @@ perl -e 'print "y" x 100000' | with_time_limit 1800 ./linker.sh
 status=${PIPESTATUS[1]}
 set -eo pipefail
 phase "linker.sh exit status: $status"
-[[ $status -eq 0 ]] || exit "$status"
+if [[ $status -ne 0 ]]; then
+  for f in ${launch_failures[@]+"${launch_failures[@]}"}; do echo "ERROR: app launch failed: $f"; done
+  exit "$status"
+fi
 
 phase "Checking that every prompt was answered y"
 failed=0
@@ -93,4 +101,5 @@ for f in "$repo"/bin/*; do
   [[ "$(readlink "$t" || true)" == "$f" ]] || { echo "ERROR: $t is not a symlink to $f"; failed=1; }
 done
 [[ -d "$HOME/.asdf/installs/ruby" ]] || { echo "ERROR: asdf Ruby was not installed"; failed=1; }
+for f in ${launch_failures[@]+"${launch_failures[@]}"}; do echo "ERROR: app launch failed: $f"; failed=1; done
 exit "$failed"
