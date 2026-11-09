@@ -1,0 +1,42 @@
+name: Baseline (old dotfiles on macOS)
+
+# Rebuilds the pre-migration state of a Mac on a fresh runner and records it.
+
+on:
+  push:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  baseline:
+    runs-on: macos-latest
+    timeout-minutes: 60
+    env:
+      OLD_DOTFILES_SHA: 8499f71ea1f088573561e42a9e7627f3dbe70de6
+      HOMEBREW_NO_AUTO_UPDATE: "1"
+      HOMEBREW_NO_INSTALL_CLEANUP: "1"
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Record the runner before changes
+        run: |
+          mkdir -p "$RUNNER_TEMP/baseline"
+          ls -la "$HOME" | tee "$RUNNER_TEMP/baseline/home-listing-before.txt"
+          ls -ld /usr/local/bin || true
+
+      - name: Install old dotfiles with linker.sh
+        run: ci/install-old-dotfiles.sh
+
+      - name: Snapshot the result
+        if: always()
+        run: |
+          ci/snapshot.sh "$RUNNER_TEMP/baseline"
+          for f in home-entries.txt zsh-startup.txt tools.txt; do echo "== $f"; cat "$RUNNER_TEMP/baseline/$f"; done
+
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: baseline
+          path: ${{ runner.temp }}/baseline
