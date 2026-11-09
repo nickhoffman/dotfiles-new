@@ -65,6 +65,12 @@ printf '#!/bin/sh\nexec %s "$@" < /dev/null\n' "$(command -v brew)" > "$shims/br
 chmod +x "$shims/brew"
 export PATH="$shims:$PATH"
 
+# On the personal Mac ~/.config is a symlink into the repo. The runner comes
+# with its own ~/.config, which linker.sh would skip, so move it aside.
+if [[ -d "$HOME/.config" && ! -L "$HOME/.config" ]]; then
+  mv "$HOME/.config" "$RUNNER_TEMP/runner-dot-config"
+fi
+
 # Entries of home/ that already exist as real directories are skipped by linker.sh.
 preexisting=()
 for f in "$repo"/home/.[^.]*; do

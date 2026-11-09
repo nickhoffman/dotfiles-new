@@ -14,7 +14,7 @@ jobs:
     runs-on: macos-latest
     timeout-minutes: 45
     env:
-      OLD_DOTFILES_SHA: 8499f71ea1f088573561e42a9e7627f3dbe70de6
+      OLD_DOTFILES_SHA: 08b6becd14d20b4104c95263ead2ec15dc74dcf9
       HOMEBREW_NO_AUTO_UPDATE: "1"
       HOMEBREW_NO_INSTALL_CLEANUP: "1"
     steps:
@@ -28,6 +28,10 @@ jobs:
 
       - name: Install old dotfiles with linker.sh
         run: ci/install-old-dotfiles.sh
+
+      - name: Plant fake app data like the personal Mac's
+        timeout-minutes: 2
+        run: ci/seed-fake-data.sh "$RUNNER_TEMP/baseline/seeded-data.sha256"
 
       - name: Snapshot the result
         if: always()
