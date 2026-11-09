@@ -20,11 +20,15 @@ old_repo_unchanged() { # before-snapshot-dir
   (cd "$HOME/src/dotfiles" && find . -path ./.git -prune -o -type f -print0 | sort -z | xargs -0 shasum -a 256) > "$now"
   cmp -s "$1/repo-checksums.txt" "$now" || { diff "$1/repo-checksums.txt" "$now" | head; return 1; }
 }
-# Checksums of files under ~, minus caches, runner dirs, repos, migration state
-# and chezmoi's own state database (which chezmoi updates on every apply).
-tree_list() { (cd "$HOME" && find . \( -path ./Library -o -path ./work -o -path ./actions-runner -o -path ./.cache \
-  -o -path ./.dotfiles-migration -o -path ./src -o -path ./.config/chezmoi -o -name .zsh_history -o -name '.zcompdump*' \) -prune \
-  -o -type f -print0 | sort -z | xargs -0 shasum -a 256); }
+# Checksums (or link targets) of every file chezmoi manages. Scanning all of ~
+# would catch unrelated background activity, such as macOS creating ~/Movies/TV.
+tree_list() {
+  chezmoi managed --include files,symlinks --path-style absolute < /dev/null | LC_ALL=C sort | while IFS= read -r p; do
+    if [[ -L "$p" ]]; then echo "link $(readlink "$p") $p"
+    elif [[ -f "$p" ]]; then echo "$(shasum -a 256 < "$p" | cut -d' ' -f1) $p"
+    else echo "missing $p"; fi
+  done
+}
 idempotent_apply() {
   local before after status
   before=$(mktemp); after=$(mktemp)
