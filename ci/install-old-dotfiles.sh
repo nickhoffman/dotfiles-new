@@ -10,6 +10,12 @@ if [[ "${CI:-}" != "true" ]]; then
   exit 1
 fi
 
+# Prints a timestamped phase header, so the log shows how long each phase took.
+phase() { echo "### [$(date -u +%H:%M:%S)] $*"; }
+
+# Runs a command, killing it after N seconds (macOS has no timeout(1)).
+with_time_limit() { local secs=$1; shift; perl -e 'alarm shift; exec @ARGV' "$secs" "$@"; }
+
 repo="$HOME/src/dotfiles"
 git clone https://github.com/nickhoffman/dotfiles "$repo"
 git -C "$repo" checkout --quiet "$OLD_DOTFILES_SHA"
@@ -18,12 +24,12 @@ git -C "$repo" checkout --quiet "$OLD_DOTFILES_SHA"
 sudo mkdir -p /usr/local/bin
 sudo chown "$(id -un)" /usr/local/bin
 
-echo "### Installing the Mac apps whose preferences linker.sh imports"
+phase "Installing the Mac apps whose preferences linker.sh imports"
 # Not iTerm2 (replaced by Ghostty) or MeetingBar (a private fork on the work Mac).
 apps=(ghostty rectangle alt-tab alfred bartender cleanshot)
-brew install --cask "${apps[@]}"
+with_time_limit 900 brew install --cask "${apps[@]}"
 
-echo "### Launching each app once so it writes its first-run preferences"
+phase "Launching each app once so it writes its first-run preferences"
 for app in Ghostty Rectangle AltTab "Alfred 5" "Bartender 6" "CleanShot X"; do
   if open -a "$app"; then
     sleep 10
@@ -36,14 +42,16 @@ for app in Ghostty Rectangle AltTab "Alfred 5" "Bartender 6" "CleanShot X"; do
   fi
 done
 
-echo "### Installing oh-my-zsh (unattended)"
+phase "Installing oh-my-zsh (unattended)"
 RUNZSH=no CHSH=no sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)" "" --unattended
 
-echo "### Running linker.sh, answering y to every prompt"
+phase "Running linker.sh, answering y to every prompt"
 # linker.sh reads single keypresses (read -n 1), so send y's with no newlines.
+# The input is finite on purpose: an endless `yes` kept the pipeline running
+# after linker.sh exited. Homebrew also swallows some of it, hence the size.
 cd "$repo"
 set +eo pipefail
-yes y | tr -d '\n' | ./linker.sh
-status=${PIPESTATUS[2]}
-echo "linker.sh exit status: $status"
+perl -e 'print "y" x 100000' | with_time_limit 1800 ./linker.sh
+status=${PIPESTATUS[1]}
+phase "linker.sh exit status: $status"
 exit "$status"
