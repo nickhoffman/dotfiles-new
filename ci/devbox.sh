@@ -10,7 +10,7 @@ source "$here/assert-lib.sh"
 
 # Like the README: retry the whole one-liner, since the release download inside
 # get.chezmoi.io's script has no retries of its own.
-with_retries() { local i; for i in 1 2 3; do "$@" && return 0; echo "Attempt $i failed; retrying in 10s"; sleep 10; done; return 1; }
+with_retries() { local i; for i in 1 2 3 4 5; do "$@" && return 0; echo "Attempt $i failed; retrying in $((i * 15))s"; sleep $((i * 15)); done; return 1; }
 
 echo "== Install chezmoi only"
 with_retries sh -c 'sh -c "$(curl -fsLS --retry 5 --retry-all-errors get.chezmoi.io)" -- -b "$HOME/.local/bin"' < /dev/null

@@ -30,9 +30,9 @@ doesn't retry on its own, and GitHub sometimes returns HTTP 504. Re-running is
 safe.
 
 ```sh
-for attempt in 1 2 3; do
+for attempt in 1 2 3 4 5; do
   DOTFILES_PROFILE=devbox sh -c "$(curl -fsLS --retry 5 --retry-all-errors get.chezmoi.io)" -- -b ~/.local/bin init --apply nickhoffman/dotfiles-new && break
-  sleep 10
+  sleep $((attempt * 15))
 done
 ```
 
