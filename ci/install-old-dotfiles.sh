@@ -27,7 +27,12 @@ sudo chown "$(id -un)" /usr/local/bin
 phase "Installing the Mac apps whose preferences linker.sh imports"
 # Not iTerm2 (replaced by Ghostty) or MeetingBar (a private fork on the work Mac).
 apps=(ghostty rectangle alt-tab alfred bartender cleanshot)
-with_time_limit 900 brew install --cask "${apps[@]}"
+# Downloads sometimes fail on runners; retry a few times.
+for attempt in 1 2 3; do
+  with_time_limit 900 brew install --cask "${apps[@]}" && break
+  [[ $attempt -eq 3 ]] && exit 1
+  echo "Cask install failed (attempt $attempt); retrying in 20s"; sleep 20
+done
 
 phase "Launching each app once so it writes its first-run preferences"
 # Open by path: right after install, Launch Services may not know the app names yet.

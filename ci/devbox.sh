@@ -10,7 +10,7 @@ source "$here/assert-lib.sh"
 
 echo "== A missing profile fails fast instead of hanging"
 start=$(date +%s)
-out=$(env -u DOTFILES_PROFILE timeout 60 sh -c "$(curl -fsLS get.chezmoi.io)" -- -b "$HOME/.local/bin" init --source "$src" 2>&1 < /dev/null); rc=$?
+out=$(env -u DOTFILES_PROFILE timeout 60 sh -c "$(curl -fsLS --retry 5 --retry-all-errors get.chezmoi.io)" -- -b "$HOME/.local/bin" init --source "$src" 2>&1 < /dev/null); rc=$?
 check "chezmoi init without a profile fails" test "$rc" -ne 0 -a "$rc" -ne 124
 check "the error names DOTFILES_PROFILE" grep -q DOTFILES_PROFILE <<< "$out"
 check "it fails within 30 seconds" test $(( $(date +%s) - start )) -lt 30
@@ -20,9 +20,9 @@ echo "== Bootstrap"
 start=$(date +%s)
 if [[ $mode == github ]]; then
   # The exact one-liner from the README, against the repo on GitHub.
-  DOTFILES_PROFILE=devbox sh -c "$(curl -fsLS get.chezmoi.io)" -- -b ~/.local/bin init --apply nickhoffman/dotfiles-new < /dev/null; rc=$?
+  DOTFILES_PROFILE=devbox sh -c "$(curl -fsLS --retry 5 --retry-all-errors get.chezmoi.io)" -- -b ~/.local/bin init --apply nickhoffman/dotfiles-new < /dev/null; rc=$?
 else
-  DOTFILES_PROFILE=devbox sh -c "$(curl -fsLS get.chezmoi.io)" -- -b ~/.local/bin init --apply --source "$src" < /dev/null; rc=$?
+  DOTFILES_PROFILE=devbox sh -c "$(curl -fsLS --retry 5 --retry-all-errors get.chezmoi.io)" -- -b ~/.local/bin init --apply --source "$src" < /dev/null; rc=$?
 fi
 echo "Bootstrap took $(( $(date +%s) - start ))s"
 export PATH="$HOME/.local/bin:$PATH"
