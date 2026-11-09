@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>NSStatusItem Preferred Position Item-0</key>
+	<real>295</real>
+	<key>NSWindow Frame com.sindresorhus.Preferences.FrameAutosaveName</key>
+	<string>501 370 528 257 0 0 1512 944 </string>
+	<key>NSWindow Frame com.sindresorhus.Settings.FrameAutosaveName</key>
+	<string>1511 890 480 241 0 0 3440 1409 </string>
+	<key>appVersion</key>
+	<string>1.7.0</string>
+	<key>dropdownTruncationLength</key>
+	<integer>20</integer>
+	<key>eodMessage</key>
+	<string>No more meetings!</string>
+	<key>hideDeclinedEvents</key>
+	<true/>
+	<key>idFilters</key>
+	<array/>
+	<key>joinEventNotification</key>
+	<array>
+		<integer>2</integer>
+	</array>
+	<key>menuBarRsvpApperarance</key>
+	<string>hide</string>
+	<key>menuBarTruncationLength</key>
+	<integer>20</integer>
+	<key>notificationDisplayTypeForInterval</key>
+	<dict>
+		<key>2</key>
+		<string>windowed</string>
+	</dict>
+	<key>onboardingCompleted</key>
+	<true/>
+	<key>rewriteZoomUrls</key>
+	<true/>
+	<key>showDayOfMonth</key>
+	<false/>
+	<key>showEventEndTime</key>
+	<true/>
+	<key>showEventsSectionDayCount</key>
+	<integer>1</integer>
+	<key>showMenuBarZoomIcon</key>
+	<false/>
+	<key>timeFormat</key>
+	<string>twentyFourHour</string>
+</dict>
+</plist>

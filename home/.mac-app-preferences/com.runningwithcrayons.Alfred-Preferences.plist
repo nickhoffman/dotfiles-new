@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>NSNavPanelExpandedSizeForOpenMode</key>
+	<string>{836, 520}</string>
+	<key>NSOSPLastRootDirectory</key>
+	<data>
+	Ym9vawwCAAAAAAUQQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+	AAAAAAAAAAAAAAAAABABAAAEAAAAAwMAAAAAACAMAAAAAQEAAEFwcGxpY2F0aW9ucwQA
+	AAABBgAAEAAAAAgAAAAEAwAAaPlNAwAAAAAEAAAAAQYAADAAAAAIAAAAAAQAAEHIMoI2
+	gAAAGAAAAAECAAACAAAAAAAAAA8AAAAAAAAAAAAAAAAAAAAAAAAAAQUAAAgAAAABCQAA
+	ZmlsZTovLy8MAAAAAQEAAE1hY2ludG9zaCBIRAgAAAAEAwAAAJCClucAAAAkAAAAAQEA
+	ADQ5QTBEOTJCLUYwNTgtNEFFRS1BREU0LTJEODZCM0Y1NUIzOBgAAAABAgAAgQAAAAEA
+	AADvEwAAAQAAAAAAAAAAAAAAAQAAAAEBAAAvAAAAtAAAAP7///8BAAAAAAAAAA4AAAAE
+	EAAAJAAAAAAAAAAFEAAAQAAAAAAAAAAQEAAAXAAAAAAAAABAEAAATAAAAAAAAAACIAAA
+	BAEAAAAAAAAFIAAAhAAAAAAAAAAQIAAAlAAAAAAAAAARIAAAuAAAAAAAAAASIAAAqAAA
+	AAAAAAATIAAATAAAAAAAAAAgIAAA5AAAAAAAAAAwIAAAfAAAAAAAAAAB0AAAfAAAAAAA
+	AAAQ0AAABAAAAAAAAAA=
+	</data>
+	<key>NSSplitView Subview Frames NSColorPanelSplitView</key>
+	<array>
+		<string>0.000000, 0.000000, 266.000000, 300.000000, NO, NO</string>
+		<string>0.000000, 320.000000, 266.000000, 99.000000, NO, NO</string>
+	</array>
+	<key>NSToolbar Configuration com.apple.NSColorPanel</key>
+	<dict>
+		<key>TB Is Shown</key>
+		<integer>1</integer>
+	</dict>
+	<key>NSWindow Frame NSColorPanel</key>
+	<string>160 110 266 361 0 0 3440 1409 </string>
+	<key>NSWindow Frame NSFontPanel</key>
+	<string>2925 70 470 270 0 0 3440 1409 </string>
+	<key>NSWindow Frame alfredprefswindow</key>
+	<string>211 200 1180 740 0 0 1512 948 </string>
+	<key>automationtasks.lastNotified</key>
+	<integer>794888075</integer>
+	<key>catalinaCacheChecked</key>
+	<true/>
+	<key>importSnippetLastCollection</key>
+	<string>Default Collection</string>
+	<key>lastFeature</key>
+	<string>snippets</string>
+	<key>lastFeatureTS</key>
+	<integer>815470956</integer>
+	<key>lastTab</key>
+	<string>workflows</string>
+	<key>lastTabBuild</key>
+	<integer>2349</integer>
+	<key>syncfolder</key>
+	<string>~/src/dotfiles-new/alfred</string>
+	<key>themeEditorBackground</key>
+	<string>Sonoma.heic</string>
+	<key>workflowpalette.expansion</key>
+	<dict>
+		<key>actions</key>
+		<false/>
+		<key>automations</key>
+		<false/>
+		<key>inputs</key>
+		<false/>
+		<key>outputs</key>
+		<false/>
+		<key>palette.gettingstarted</key>
+		<false/>
+		<key>section.favourites</key>
+		<false/>
+		<key>section.prefabs</key>
+		<false/>
+		<key>triggers</key>
+		<false/>
+		<key>userinterface</key>
+		<false/>
+		<key>utilities</key>
+		<false/>
+	</dict>
+</dict>
+</plist>

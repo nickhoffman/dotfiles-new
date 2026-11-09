@@ -1,0 +1,1 @@
+You've done an amazing job. Thank you. I'm so proud of you. It's time to pause here, though. Other than what's in the current plan, what context should I give to the next Claude Code session when I'm ready to resume working on this?

@@ -1,0 +1,27 @@
+{{- /*
+  Machine profile: personal | work | devbox.
+  Order: $DOTFILES_PROFILE, then the value saved by an earlier `chezmoi init`,
+  then a prompt. With no terminal and no saved value, fail instead of hanging.
+*/ -}}
+{{- $choices := list "personal" "work" "devbox" -}}
+{{- $profile := env "DOTFILES_PROFILE" -}}
+{{- if and (not $profile) (hasKey . "profile") -}}
+{{-   $profile = .profile -}}
+{{- end -}}
+{{- if not $profile -}}
+{{-   if stdinIsATTY -}}
+{{-     $profile = promptChoiceOnce . "profile" "Machine profile" $choices -}}
+{{-   else -}}
+{{-     fail "No machine profile. Set DOTFILES_PROFILE to personal, work or devbox (no terminal to prompt on)." -}}
+{{-   end -}}
+{{- end -}}
+{{- if not (has $profile $choices) -}}
+{{-   fail (printf "Unknown machine profile %q. Use personal, work or devbox." $profile) -}}
+{{- end -}}
+sourceDir = {{ .chezmoi.workingTree | quote }}
+
+[data]
+    profile = {{ $profile | quote }}
+
+[diff]
+    exclude = ["scripts"]

@@ -67,7 +67,9 @@ export PATH="$shims:$PATH"
 
 # On the personal Mac ~/.config is a symlink into the repo. The runner comes
 # with its own ~/.config, which linker.sh would skip, so move it aside.
-if [[ -d "$HOME/.config" && ! -L "$HOME/.config" ]]; then
+# LAYOUT=real-config keeps the runner's ~/.config, so linker.sh skips it (a
+# Mac where ~/.config existed before linker.sh ran).
+if [[ "${LAYOUT:-personal}" == personal && -d "$HOME/.config" && ! -L "$HOME/.config" ]]; then
   mv "$HOME/.config" "$RUNNER_TEMP/runner-dot-config"
 fi
 

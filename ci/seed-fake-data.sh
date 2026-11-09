@@ -13,9 +13,7 @@ if [[ "${CI:-}" != "true" ]]; then
   exit 1
 fi
 
-for link in .config .claude; do
-  [[ -L "$HOME/$link" ]] || { echo "ERROR: ~/$link must be a symlink into the old repo" >&2; exit 1; }
-done
+[[ -L "$HOME/.claude" ]] || { echo "ERROR: ~/.claude must be a symlink into the old repo" >&2; exit 1; }
 
 planted=()
 
@@ -41,7 +39,7 @@ plant .claude/.caveman-active 'FAKE'
 plant .claude/stats-cache.json '{"FAKE":1}'
 mkdir -p "$HOME"/.claude/{ssh,tmp,state,telemetry,session-env,debug}
 
-# App data under ~/.config.
+# App data under ~/.config (inside the old repo when ~/.config is a symlink).
 plant .config/gcloud/credentials.db 'FAKE gcloud credentials database'
 plant .config/gcloud/configurations/config_default '[core]' 'account = fake@example.com' 'project = fake-project'
 plant .config/stripe/config.toml '[default]' 'test_mode_api_key = "sk_test_FAKE0000000000000000"'
@@ -49,6 +47,7 @@ plant .config/devbox/env 'TS_AUTHKEY=tskey-FAKE' 'GH_TOKEN=github_pat_FAKE' 'REP
 
 # Finder litter and an untracked Alfred preference, as on the personal Mac.
 for d in "$repo" "$repo/home" "$repo/home/.claude" "$repo/home/.config" "$repo/misc"; do
+  [[ -d "$d" ]] || continue
   printf 'FAKE DS_Store\n' > "$d/.DS_Store"
 done
 alfred_local="$repo/misc/Alfred.alfredpreferences/preferences/local/73ce1a76e26060e47f2b0dd000b1598449deacc8/appearance"

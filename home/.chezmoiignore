@@ -1,0 +1,34 @@
+# Templated per machine. Paths are targets relative to ~.
+{{- $mac := eq .chezmoi.os "darwin" }}
+
+{{- if not $mac }}
+# macOS only
+.bundle
+.config/devbox
+.config/ghostty
+.config/iterm2
+.gemrc
+.gitconfig
+.gitwtfrc
+.hushlogin
+.irbrc
+.local/bin/git-wtf
+.local/bin/toggle_bluetooth_devices.sh
+.p10k.zsh
+.tmux-mac.conf
+.tmuxp
+.zprofile
+.zshrc
+.config/nvim
+.shell_scripts/chruby.sh
+{{- end }}
+
+{{- if $mac }}
+# Linux only
+.bashrc
+.config/git/config
+{{- end }}
+
+{{- if ne .profile "devbox" }}
+.bashrc
+{{- end }}

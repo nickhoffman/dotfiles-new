@@ -1,0 +1,95 @@
+name: Tests
+
+# Every Mac job starts from a fresh runner, rebuilds the old linker.sh setup
+# (modelled on the personal Mac) and then tests one migration scenario.
+
+on:
+  push:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+env:
+  OLD_DOTFILES_SHA: 08b6becd14d20b4104c95263ead2ec15dc74dcf9
+  HOMEBREW_NO_AUTO_UPDATE: "1"
+  HOMEBREW_NO_INSTALL_CLEANUP: "1"
+
+jobs:
+  mac:
+    name: mac (${{ matrix.scenario }})
+    runs-on: macos-latest
+    timeout-minutes: 45
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - { scenario: migrate-personal, layout: personal }
+          - { scenario: migrate-work,     layout: real-config }
+          - { scenario: rollback,         layout: personal }
+          - { scenario: abort-local-edit, layout: personal }
+    env:
+      LAYOUT: ${{ matrix.layout }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install old dotfiles with linker.sh
+        timeout-minutes: 25
+        run: ci/install-old-dotfiles.sh
+
+      - name: Plant fake app data like the personal Mac's
+        timeout-minutes: 2
+        run: |
+          mkdir -p "$RUNNER_TEMP/baseline"
+          ci/seed-fake-data.sh "$RUNNER_TEMP/baseline/seeded-data.sha256"
+
+      - name: Snapshot the baseline
+        timeout-minutes: 5
+        run: ci/snapshot.sh "$RUNNER_TEMP/baseline"
+
+      - name: Test the Mac inventory script
+        if: matrix.scenario == 'migrate-personal'
+        timeout-minutes: 5
+        run: ci/test-mac-inventory.sh "$RUNNER_TEMP/baseline"
+
+      - name: Run scenario ${{ matrix.scenario }}
+        timeout-minutes: 30
+        run: ci/scenario.sh ${{ matrix.scenario }}
+
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: mac-${{ matrix.scenario }}
+          path: |
+            ${{ runner.temp }}/baseline
+            ${{ runner.temp }}/out
+
+  fresh-mac:
+    runs-on: macos-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up a new Mac with chezmoi
+        timeout-minutes: 30
+        run: ci/fresh-mac.sh
+
+  devbox:
+    name: devbox (${{ matrix.source }})
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    strategy:
+      fail-fast: false
+      matrix:
+        source: [local, github]
+    steps:
+      - uses: actions/checkout@v4
+      - name: Bootstrap a fresh Ubuntu container with no terminal
+        timeout-minutes: 10
+        run: |
+          docker run --rm -v "$GITHUB_WORKSPACE:/work:ro" ubuntu:26.04 bash -euc '
+            apt-get update -qq && apt-get install -y -qq curl ca-certificates sudo git > /dev/null
+            useradd -m -s /bin/bash dev
+            echo "dev ALL=(ALL) NOPASSWD:ALL" > /etc/sudoers.d/dev
+            cp -R /work /home/dev/dotfiles-src && chown -R dev: /home/dev/dotfiles-src
+            su - dev -c "bash /home/dev/dotfiles-src/ci/devbox.sh /home/dev/dotfiles-src ${{ matrix.source }}"
+          ' < /dev/null

@@ -1,0 +1,7 @@
+session_name: expert_insights
+start_directory: ~/src/expert_insights
+windows:
+  - window_name: code
+  - window_name: shell
+  - window_name: console
+  - window_name: server

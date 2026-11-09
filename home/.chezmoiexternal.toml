@@ -1,0 +1,10 @@
+# Vim plugins that the old repo kept as git submodules, pinned to the same commits.
+[".vim/bundle/vim-prettier"]
+    type = "archive"
+    url = "https://github.com/prettier/vim-prettier/archive/7dbdbb12c50a9f4ba72390cce2846248e4368fd0.tar.gz"
+    stripComponents = 1
+
+[".vim/bundle/vim-graphql"]
+    type = "archive"
+    url = "https://github.com/jparise/vim-graphql/archive/de5753e3fbd89f2939a43cfc2c6a2313ff129a21.tar.gz"
+    stripComponents = 1

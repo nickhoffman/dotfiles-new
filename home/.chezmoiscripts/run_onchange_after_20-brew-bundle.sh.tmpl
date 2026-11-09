@@ -1,0 +1,16 @@
+{{- if eq .chezmoi.os "darwin" -}}
+#!/bin/bash
+# Installs missing Homebrew packages. Never upgrades or removes anything.
+# Brewfile.common hash: {{ include ".brew/Brewfile.common" | sha256sum }}
+# Brewfile.{{ .profile }} hash: {{ include (printf ".brew/Brewfile.%s" .profile) | sha256sum }}
+set -euo pipefail
+if ! command -v brew > /dev/null; then
+  for b in /opt/homebrew/bin/brew /usr/local/bin/brew; do [[ -x $b ]] && eval "$("$b" shellenv)" && break; done
+fi
+command -v brew > /dev/null || { echo "ERROR: Homebrew is not installed. Install it from https://brew.sh and re-run chezmoi apply." >&2; exit 1; }
+export HOMEBREW_NO_AUTO_UPDATE=1
+brew bundle --no-upgrade --file=- <<'BREWFILE'
+{{ include ".brew/Brewfile.common" }}
+{{ include (printf ".brew/Brewfile.%s" .profile) }}
+BREWFILE
+{{ end -}}

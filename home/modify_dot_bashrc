@@ -1,0 +1,11 @@
+{{- /* chezmoi:modify-template */ -}}
+{{- /* Devbox only (see .chezmoiignore): appends a block that loads the shared aliases. */ -}}
+{{- $begin := "# >>> dotfiles-new >>>" -}}
+{{- if contains $begin .chezmoi.stdin -}}
+{{-   .chezmoi.stdin -}}
+{{- else -}}
+{{-   .chezmoi.stdin }}
+{{ $begin }}
+for f in ~/.shell_scripts/aliases.sh ~/.shell_scripts/git_aliases.sh; do [ -r "$f" ] && . "$f"; done
+# <<< dotfiles-new <<<
+{{ end -}}

@@ -1,0 +1,9 @@
+session_name: sl
+start_directory: ~/src/shelflife
+windows:
+  - window_name: code
+  - window_name: shell
+  - window_name: console
+  - window_name: server
+  - window_name: app01
+  - window_name: mongo

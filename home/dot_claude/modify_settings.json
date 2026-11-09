@@ -1,0 +1,23 @@
+{{- /* chezmoi:modify-template */ -}}
+{{- /*
+  Sets only the top-level keys this profile owns (see .chezmoidata/claude-settings.json)
+  and keeps every other key, so settings Claude Code writes itself survive.
+  If nothing would change, the file passes through byte for byte.
+*/ -}}
+{{- $owned := index .claudeSettings .profile | default dict -}}
+{{- $input := .chezmoi.stdin -}}
+{{- $current := dict -}}
+{{- if trim $input -}}
+{{-   $current = fromJson $input -}}
+{{- end -}}
+{{- $result := deepCopy $current -}}
+{{- range $key, $value := $owned -}}
+{{-   $result = setValueAtPath $key $value $result -}}
+{{- end -}}
+{{- if and (trim $input) (eq (toJson $result) (toJson $current)) -}}
+{{-   $input -}}
+{{- else if not $owned -}}
+{{-   $input -}}
+{{- else -}}
+{{-   toPrettyJson "  " $result }}
+{{ end -}}

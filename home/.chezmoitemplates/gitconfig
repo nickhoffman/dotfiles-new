@@ -1,0 +1,35 @@
+[user]
+  name = Nick Hoffman
+  email = nick@deadorange.com
+[color]
+  branch = auto
+  diff = auto
+  interactive = auto
+  status = auto
+  ui = auto
+[merge]
+  tool = vimdiff
+[core]
+  editor = vim
+  commitGraph = true
+[interactive]
+  singlekey = true
+[push]
+  default = current
+[pull]
+  default = current
+  rebase = true
+[hub]
+  protocol = ssh
+[init]
+  templatedir = ~/.git_template
+[diff]
+  algorithm = patience
+[protocol]
+  version = 2
+[gc]
+  writeCommitGraph = true
+{{- if eq .chezmoi.os "darwin" }}
+[credential]
+  helper = osxkeychain
+{{- end }}

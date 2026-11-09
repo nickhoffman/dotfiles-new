@@ -1,0 +1,7 @@
+{{- if eq .chezmoi.os "darwin" -}}
+#!/bin/bash
+# Installs oh-my-zsh unattended, keeping the ~/.zshrc chezmoi manages.
+set -euo pipefail
+[[ -d "$HOME/.oh-my-zsh" ]] && exit 0
+RUNZSH=no CHSH=no KEEP_ZSHRC=yes sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)" "" --unattended
+{{ end -}}

@@ -1,0 +1,234 @@
+{
+  "claudeSettings": {
+    "_comment": "Top-level keys of ~/.claude/settings.json owned by each profile. Keys not listed are left alone, including the ones Claude Code writes itself. An empty profile leaves the file untouched.",
+    "personal": {
+      "permissions": {
+        "allow": [
+          "WebFetch(domain:docs.anthropic.com)",
+          "Bash(find:*)",
+          "Bash(git:*)",
+          "Bash(mkdir:*)",
+          "Bash(mv:*)",
+          "Bash(npm install:*)",
+          "Bash(npm run lint)",
+          "Bash(npm run build:*)",
+          "Bash(npm test)",
+          "Bash(npm test:*)",
+          "Bash(npm run dev:*)",
+          "Bash(npm run test:*)",
+          "Bash(rg:*)",
+          "Bash(rm:*)",
+          "Bash(ls)"
+        ],
+        "deny": [],
+        "blockReadsOutsideWorkingDirectories": true
+      },
+      "model": "opus",
+      "hooks": {
+        "Notification": [
+          {
+            "matcher": "idle_prompt",
+            "hooks": [
+              {
+                "type": "command",
+                "command": "osascript -e 'display notification \"Claude Code is finished.\" with title \"Claude Code\"'"
+              }
+            ]
+          },
+          {
+            "matcher": "permission_prompt",
+            "hooks": [
+              {
+                "type": "command",
+                "command": "osascript -e 'display notification \"Claude Code requires permission.\" with title \"Claude Code\"'"
+              }
+            ]
+          },
+          {
+            "hooks": [
+              {
+                "type": "command",
+                "command": "~/.config/iterm2/cc-status"
+              }
+            ]
+          }
+        ],
+        "PermissionRequest": [
+          {
+            "hooks": [
+              {
+                "type": "command",
+                "command": "~/.config/iterm2/cc-status"
+              }
+            ]
+          }
+        ],
+        "PostToolUse": [
+          {
+            "hooks": [
+              {
+                "type": "command",
+                "command": "~/.config/iterm2/cc-status"
+              }
+            ]
+          }
+        ],
+        "PreToolUse": [
+          {
+            "hooks": [
+              {
+                "type": "command",
+                "command": "~/.config/iterm2/cc-status"
+              }
+            ]
+          }
+        ],
+        "SessionEnd": [
+          {
+            "hooks": [
+              {
+                "type": "command",
+                "command": "~/.config/iterm2/cc-status"
+              }
+            ]
+          }
+        ],
+        "SessionStart": [
+          {
+            "hooks": [
+              {
+                "type": "command",
+                "command": "~/.config/iterm2/cc-status"
+              }
+            ]
+          }
+        ],
+        "Stop": [
+          {
+            "hooks": [
+              {
+                "type": "command",
+                "command": "~/.config/iterm2/cc-status"
+              }
+            ]
+          }
+        ],
+        "StopFailure": [
+          {
+            "hooks": [
+              {
+                "type": "command",
+                "command": "~/.config/iterm2/cc-status"
+              }
+            ]
+          }
+        ],
+        "SubagentStop": [
+          {
+            "hooks": [
+              {
+                "type": "command",
+                "command": "~/.config/iterm2/cc-status"
+              }
+            ]
+          }
+        ],
+        "UserPromptSubmit": [
+          {
+            "hooks": [
+              {
+                "type": "command",
+                "command": "~/.config/iterm2/cc-status"
+              }
+            ]
+          }
+        ]
+      },
+      "statusLine": {
+        "type": "command",
+        "command": "bash \"~/.claude/statusline-command.sh\""
+      },
+      "enabledPlugins": {
+        "caveman@caveman": true,
+        "vercel@claude-plugins-official": true
+      },
+      "extraKnownMarketplaces": {
+        "caveman": {
+          "source": {
+            "source": "github",
+            "repo": "JuliusBrussee/caveman"
+          }
+        },
+        "claude-plugins-official": {
+          "source": {
+            "source": "github",
+            "repo": "anthropics/claude-plugins-official"
+          }
+        }
+      },
+      "sandbox": {
+        "enabled": true,
+        "allowUnsandboxedCommands": false,
+        "network": {
+          "allowLocalBinding": true
+        }
+      },
+      "alwaysThinkingEnabled": false,
+      "effortLevel": "medium",
+      "modelSettings": {
+        "claude-opus-5-5": {
+          "effortLevel": "medium"
+        },
+        "claude-sonnet-5-5": {
+          "effortLevel": "medium"
+        }
+      },
+      "tui": "fullscreen",
+      "theme": "auto",
+      "remoteControlAtStartup": true,
+      "agentPushNotifEnabled": true
+    },
+    "work": {},
+    "devbox": {
+      "permissions": {
+        "allow": [
+          "WebFetch(domain:docs.anthropic.com)",
+          "Bash(find:*)",
+          "Bash(git:*)",
+          "Bash(mkdir:*)",
+          "Bash(mv:*)",
+          "Bash(npm install:*)",
+          "Bash(npm run lint)",
+          "Bash(npm run build:*)",
+          "Bash(npm test)",
+          "Bash(npm test:*)",
+          "Bash(npm run dev:*)",
+          "Bash(npm run test:*)",
+          "Bash(rg:*)",
+          "Bash(rm:*)",
+          "Bash(ls)"
+        ],
+        "deny": []
+      },
+      "model": "opus",
+      "statusLine": {
+        "type": "command",
+        "command": "bash \"~/.claude/statusline-command.sh\""
+      },
+      "alwaysThinkingEnabled": false,
+      "effortLevel": "medium",
+      "modelSettings": {
+        "claude-opus-5-5": {
+          "effortLevel": "medium"
+        },
+        "claude-sonnet-5-5": {
+          "effortLevel": "medium"
+        }
+      },
+      "tui": "fullscreen",
+      "theme": "auto",
+      "remoteControlAtStartup": true,
+      "agentPushNotifEnabled": true
+    }
+  }
+}

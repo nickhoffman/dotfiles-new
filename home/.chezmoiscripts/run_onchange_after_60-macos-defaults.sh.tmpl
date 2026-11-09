@@ -1,0 +1,7 @@
+{{- if eq .chezmoi.os "darwin" -}}
+#!/bin/bash
+# Enables key repeat in VS Code and its variants by disabling press-and-hold.
+for domain in com.microsoft.VSCode com.microsoft.VSCodeInsiders com.visualstudio.code.oss com.vscodium com.microsoft.VSCodeExploration; do
+  defaults write "$domain" ApplePressAndHoldEnabled -bool false
+done
+{{ end -}}

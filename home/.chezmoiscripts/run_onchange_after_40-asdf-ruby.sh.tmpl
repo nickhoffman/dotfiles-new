@@ -1,0 +1,21 @@
+{{- if eq .chezmoi.os "darwin" -}}
+#!/bin/bash
+# Keeps asdf on its latest version and makes sure a global Ruby and the gems
+# from the old .ruby_gems_to_install exist. A Ruby version that's already set
+# is left alone; a machine without one gets the latest.
+set -euo pipefail
+gems=(awesome_print pp)
+for b in /opt/homebrew/bin/brew /usr/local/bin/brew; do [[ -x $b ]] && eval "$("$b" shellenv)" && break; done
+export HOMEBREW_NO_AUTO_UPDATE=1
+brew upgrade asdf 2>/dev/null || brew install asdf
+export PATH="${ASDF_DATA_DIR:-$HOME/.asdf}/shims:$PATH"
+asdf plugin list 2>/dev/null | grep -qx ruby || asdf plugin add ruby
+asdf plugin update ruby || true
+if ! (cd "$HOME" && grep -qE '^ruby ' "$HOME/.tool-versions" 2>/dev/null); then
+  version=$(asdf latest ruby)
+  asdf install ruby "$version"
+  (cd "$HOME" && asdf set -u ruby "$version")
+fi
+(cd "$HOME" && asdf install ruby "$(awk '$1 == "ruby" {print $2}' "$HOME/.tool-versions")")
+(cd "$HOME" && asdf exec gem install --conservative --no-document "${gems[@]}")
+{{ end -}}

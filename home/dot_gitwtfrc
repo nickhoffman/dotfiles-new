@@ -1,0 +1,6 @@
+--- 
+integration-branches: 
+- heads/master
+ignore: []
+
+max_commits: 500

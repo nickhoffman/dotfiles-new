@@ -1,0 +1,7 @@
+session_name: default
+start_directory: ~/src
+windows:
+  - window_name: code
+  - window_name: shell
+  - window_name: console
+  - window_name: server

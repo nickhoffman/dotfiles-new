@@ -1,0 +1,18 @@
+{{- if and (eq .chezmoi.os "linux") (eq .profile "devbox") -}}
+#!/bin/bash
+# Installs the few packages a devbox needs. Unattended; skips what's installed.
+set -euo pipefail
+packages=(git tmux vim tree)
+missing=()
+for p in "${packages[@]}"; do
+  dpkg-query -W -f='${Status}' "$p" 2>/dev/null | grep -q "install ok installed" || missing+=("$p")
+done
+[[ ${#missing[@]} -eq 0 ]] && exit 0
+if [[ $(id -u) -eq 0 ]]; then sudo=(); elif sudo -n true 2>/dev/null; then sudo=(sudo -n); else
+  echo "WARNING: can't install ${missing[*]}: no root and no passwordless sudo." >&2
+  exit 0
+fi
+export DEBIAN_FRONTEND=noninteractive
+"${sudo[@]}" apt-get update -qq
+"${sudo[@]}" apt-get install -y -qq --no-install-recommends "${missing[@]}"
+{{ end -}}

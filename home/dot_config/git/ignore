@@ -1,0 +1,13 @@
+*~
+._*
+.DS_Store
+*.swp
+*.swo
+db/dumps/
+vendor/bundle/
+.bundle/cache/
+notes.txt
+NOTES.md
+**/.claude/settings.local.json
+
+**/.claude/.cc-writes/

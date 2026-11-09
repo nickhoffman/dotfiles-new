@@ -1,0 +1,21 @@
+{{- if eq .chezmoi.os "darwin" -}}
+{{- $apps := list "com.knollsoft.Rectangle" "com.lwouis.alt-tab-macos" "com.runningwithcrayons.Alfred-Preferences" "com.surteesstudios.Bartender" -}}
+{{- if eq .profile "work" -}}
+{{-   $apps = concat $apps (list "com.stripe.jil.meetingbar" "pl.maketheweb.cleanshotx") -}}
+{{- end -}}
+#!/bin/bash
+# Imports saved app preferences on a Mac that has none for that app yet. Never
+# overwrites existing preferences, so it's safe on an already set-up Mac.
+set -uo pipefail
+prefs="{{ .chezmoi.sourceDir }}/.mac-app-preferences"
+{{- range $apps }}
+# {{ . }} hash: {{ include (printf ".mac-app-preferences/%s.plist" .) | sha256sum }}
+if defaults read {{ . }} > /dev/null 2>&1; then
+  echo "{{ . }}: preferences exist, leaving them alone"
+elif [[ -n "$(lsappinfo find bundleid={{ . }} 2>/dev/null)" ]]; then
+  echo "WARNING: {{ . }} is running; quit it and re-run chezmoi apply to import its preferences." >&2
+else
+  defaults import {{ . }} "$prefs/{{ . }}.plist" && echo "{{ . }}: imported preferences"
+fi
+{{- end }}
+{{ end -}}

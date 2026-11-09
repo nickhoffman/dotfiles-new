@@ -1,0 +1,21 @@
+# Homebrew packages for both Macs, from the old repo's .homebrew_packages_to_install.
+# Installed with `brew bundle --no-upgrade`: missing packages are added, nothing is
+# upgraded or removed.
+brew "zsh"
+brew "wget"
+brew "git"
+brew "md5sha1sum"
+brew "vim"
+brew "ruby"
+brew "asdf"
+brew "node"
+brew "yarn"
+brew "reattach-to-user-namespace"
+brew "tmux"
+brew "tmuxp"
+brew "powerlevel10k"
+brew "rename"
+brew "tree"
+brew "prettier"
+brew "libmagic"
+brew "blueutil"
