@@ -14,6 +14,8 @@
 # Written for the bash 3.2 and tools that ship with macOS.
 
 set -u
+# Stops git from refreshing its index and other cache files while inspecting.
+export GIT_OPTIONAL_LOCKS=0
 repo="${1:-$HOME/src/dotfiles}"
 
 section() { printf '\n## %s\n' "$*"; }
@@ -34,7 +36,11 @@ if [[ -d "$repo/.git" ]]; then
   echo "Branch: $(git -C "$repo" rev-parse --abbrev-ref HEAD 2>&1)"
   echo "Remote: $(git -C "$repo" remote get-url origin 2>&1)"
   echo "Commits not on the remote branch:"
-  git -C "$repo" log --oneline '@{upstream}..HEAD' 2>&1 | sed 's/^/  /'
+  if git -C "$repo" rev-parse --verify --quiet '@{upstream}' > /dev/null 2>&1; then
+    git -C "$repo" log --oneline '@{upstream}..HEAD' 2>&1 | sed 's/^/  /'
+  else
+    echo "  (no upstream branch to compare with)"
+  fi
   echo "Tracked files with local changes (names and line counts only):"
   git -C "$repo" diff --stat HEAD 2>&1 | sed 's/^/  /'
   echo "Untracked files not ignored:"
@@ -109,7 +115,7 @@ done
 
 section "Other local or per-machine config files in ~"
 for f in "$HOME"/.*.local "$HOME"/.*local* "$HOME"/.*work* "$HOME"/.zshenv "$HOME"/.bashrc "$HOME"/.bash_profile "$HOME"/.profile; do
-  [[ -e "$f" ]] && echo "  ${f#"$HOME"/}"
+  [[ -f "$f" ]] && echo "  ${f#"$HOME"/}"
 done | sort -u
 echo "Include and source lines in shell and git config (paths only):"
 for f in "$HOME"/.zshrc "$HOME"/.zprofile "$HOME"/.gitconfig; do

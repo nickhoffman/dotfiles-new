@@ -43,9 +43,9 @@ if [[ -s "$out/mac-inventory-stderr.txt" ]]; then
   echo "ERROR: inventory wrote to stderr:"; cat "$out/mac-inventory-stderr.txt"; failed=1
 fi
 
-# Read-only check: nothing under ~ (except caches in ~/Library and the
-# runner's own work directory) or /usr/local/bin may change.
-changed=$(find "$HOME" \( -path "$HOME/Library" -o -path "$HOME/work" \) -prune -o -newer "$marker" -print 2>/dev/null || true)
+# Read-only check: nothing under ~ or /usr/local/bin may change, except caches
+# in ~/Library and the GitHub runner's own directories.
+changed=$(find "$HOME" \( -path "$HOME/Library" -o -path "$HOME/work" -o -path "$HOME/actions-runner" \) -prune -o -newer "$marker" -print 2>/dev/null || true)
 changed+=$(find /usr/local/bin -newer "$marker" -print 2>/dev/null || true)
 if [[ -n "$changed" ]]; then
   echo "ERROR: inventory changed files:"; echo "$changed"; failed=1
