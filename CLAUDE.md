@@ -4,7 +4,7 @@ Dotfiles managed with chezmoi; see README.md for how they're used.
 
 - `home/` is the chezmoi source directory (`.chezmoiroot`). Files outside it
   are never deployed.
-- Profiles: `personal`, `work` (Macs) and `devbox` (Linux). Check every change
+- Profiles: `personal` (Mac), `work` (Mac) and `devbox` (Linux). Check every change
   against all three; `.chezmoiignore` and `.tmpl` conditionals decide what each gets.
 - The Mac files were generated from nickhoffman/dotfiles at 08b6bec. Keep them
   byte-identical to that commit unless a change is intended:
