@@ -2,6 +2,7 @@
   "claudeSettings": {
     "_comment": "Top-level keys of ~/.claude/settings.json owned by each profile. Keys not listed are left alone, including the ones Claude Code writes itself. An empty profile leaves the file untouched.",
     "personal": {
+      "idleCompaction": false,
       "permissions": {
         "allow": [
           "WebFetch(domain:docs.anthropic.com)",
@@ -190,6 +191,7 @@
     },
     "work": {},
     "devbox": {
+      "idleCompaction": false,
       "permissions": {
         "allow": [
           "WebFetch(domain:docs.anthropic.com)",

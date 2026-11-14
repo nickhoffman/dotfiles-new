@@ -6,7 +6,7 @@ Dotfiles managed with chezmoi; see README.md for how they're used.
   are never deployed.
 - Profiles: `personal` (Mac), `work` (Mac) and `devbox` (Linux). Check every change
   against all three; `.chezmoiignore` and `.tmpl` conditionals decide what each gets.
-- The Mac files were generated from nickhoffman/dotfiles at 08b6bec. Keep them
+- The Mac files were generated from nickhoffman/dotfiles at 5676c17. Keep them
   byte-identical to that commit unless a change is intended:
   `tools/migrate-mac.sh` only lets chezmoi change a file that matches the old
   repo's committed version.
