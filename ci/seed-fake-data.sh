@@ -54,6 +54,20 @@ alfred_local="$repo/misc/Alfred.alfredpreferences/preferences/local/73ce1a76e260
 mkdir -p "$alfred_local"
 printf '<plist>FAKE</plist>\n' > "$alfred_local/prefs.plist"
 
+# Alfred 5 reads its sync folder from prefs.json, not from its defaults.
+# Written as on the personal Mac. Not in the manifest: migration changes it.
+alfred_prefs="$HOME/Library/Application Support/Alfred/prefs.json"
+mkdir -p "$(dirname "$alfred_prefs")"
+cat > "$alfred_prefs" <<EOF
+{
+  "current" : "${repo//\//\\/}\/misc\/Alfred.alfredpreferences",
+  "localhash" : "73ce1a76e26060e47f2b0dd000b1598449deacc8",
+  "syncfolders" : {
+    "5" : "~\/src\/dotfiles\/misc"
+  }
+}
+EOF
+
 # The personal Mac has no ~/.zsh link.
 rm -f "$HOME/.zsh"
 
