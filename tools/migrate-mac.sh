@@ -36,6 +36,8 @@ assume_yes=0
 mode=migrate
 rollback_dir=""
 state_root="$HOME/.dotfiles-migration"
+# Alfred 5 reads its sync folder from here. Its syncfolder default is only a copy.
+alfred_prefs="$HOME/Library/Application Support/Alfred/prefs.json"
 
 # Old-repo entries the new setup doesn't deploy. Their links are removed
 # (moved into the state dir) instead of being replaced by copies.
@@ -99,6 +101,21 @@ stash() { # kind path: moves path into the state dir
   mkdir -p "$(dirname "$dest")" && mv "$2" "$dest"
 }
 
+# Points Alfred's prefs.json at a preferences bundle: `current` names the
+# bundle, and each syncfolders entry (one per Alfred version) that points
+# into the old repo names the folder holding it.
+alfred_use_new_repo() { # bundle
+  local version folder
+  plutil -replace current -string "$1" "$alfred_prefs" || return 1
+  for version in $(plutil -extract syncfolders xml1 -o - "$alfred_prefs" 2>/dev/null \
+                   | sed -n 's:.*<key>\(.*\)</key>.*:\1:p'); do
+    folder=$(plutil -extract "syncfolders.$version" raw "$alfred_prefs") || return 1
+    case "${folder/#\~/$HOME}" in
+      "$old_repo"/*) plutil -replace "syncfolders.$version" -string "~/src/dotfiles-new/alfred" "$alfred_prefs" || return 1 ;;
+    esac
+  done
+}
+
 ######## Rollback ########
 
 rollback() {
@@ -147,12 +164,20 @@ rollback() {
 
   # Alfred's sync folder.
   if [[ -f "$state/alfred-syncfolder.txt" ]]; then
-    defaults write com.runningwithcrayons.Alfred-Preferences syncfolder "$(cat "$state/alfred-syncfolder.txt")" \
-      && log "Restored Alfred's sync folder" || failed=1
+    if [[ -s "$state/alfred-syncfolder.txt" ]]; then
+      defaults write com.runningwithcrayons.Alfred-Preferences syncfolder "$(cat "$state/alfred-syncfolder.txt")" \
+        && log "Restored Alfred's sync folder" || failed=1
+    else   # Alfred had no syncfolder default before the migration
+      defaults delete com.runningwithcrayons.Alfred-Preferences syncfolder 2>/dev/null
+    fi
     if [[ -d "$(stash_path alfred "$new_repo/alfred/Alfred.alfredpreferences")" ]]; then
       stash rollback-alfred "$new_repo/alfred/Alfred.alfredpreferences" 2>/dev/null
       mv "$(stash_path alfred "$new_repo/alfred/Alfred.alfredpreferences")" "$new_repo/alfred/Alfred.alfredpreferences" || failed=1
     fi
+  fi
+  if [[ -f "$state/alfred-prefs.json" ]]; then
+    [[ -f "$alfred_prefs" ]] && { stash rollback-alfred "$alfred_prefs" || failed=1; }
+    cp -p "$state/alfred-prefs.json" "$alfred_prefs" && log "Restored Alfred's prefs.json" || failed=1
   fi
 
   # Check every link is back.
@@ -177,6 +202,9 @@ if [[ $mode == rollback ]]; then
     rollback_dir="${rollback_dir%/}"
   fi
   state="$rollback_dir"
+  if [[ -f "$state/alfred-prefs.json" ]] && pgrep -x Alfred > /dev/null; then
+    echo "Alfred is running. Quit Alfred, then re-run." >&2; exit 1
+  fi
   rollback; exit $?
 fi
 
@@ -203,9 +231,17 @@ done
 [[ -e "$HOME/.config/chezmoi" ]] && die "~/.config/chezmoi already exists, so chezmoi is already set up here."
 pgrep -x claude > /dev/null && die "Claude Code is running. Quit every Claude Code session, then re-run."
 alfred_sync=$(defaults read com.runningwithcrayons.Alfred-Preferences syncfolder 2>/dev/null || true)
-alfred_sync_abs="${alfred_sync/#\~/$HOME}"
+# The Alfred.alfredpreferences that Alfred uses.
+if [[ -f "$alfred_prefs" ]]; then
+  alfred_src=$(plutil -extract current raw "$alfred_prefs" 2>/dev/null) \
+    || die "Can't read Alfred's preferences folder from $alfred_prefs"
+elif [[ -n "$alfred_sync" ]]; then
+  alfred_src="${alfred_sync/#\~/$HOME}/Alfred.alfredpreferences"
+else
+  alfred_src=""
+fi
 alfred_moves=0
-case "$alfred_sync_abs" in
+case "$alfred_src" in
   "$old_repo"/*)
     alfred_moves=1
     pgrep -x Alfred > /dev/null && die "Alfred is running and syncs into the old repo. Quit Alfred, then re-run." ;;
@@ -228,7 +264,7 @@ free_kb=$(df -k "$HOME" | awk 'NR==2 {print $4}')
 log "Profile: $profile"
 log "Found $link_count symlinks into the old repo:"
 while IFS=$'\t' read -r l t; do log "  $l -> $t"; done < "$state/links-found.tsv"
-[[ $alfred_moves -eq 1 ]] && log "Alfred's sync folder will move from $alfred_sync to ~/src/dotfiles-new/alfred"
+[[ $alfred_moves -eq 1 ]] && log "Alfred's sync folder will move from $(dirname "$alfred_src") to ~/src/dotfiles-new/alfred"
 
 if [[ $assume_yes -ne 1 ]]; then
   [[ -t 0 ]] || die "Pass --yes to run without a terminal."
@@ -311,16 +347,23 @@ done < "$state/links-found.tsv"
 
 ### Alfred's sync folder
 if [[ $alfred_moves -eq 1 ]]; then
-  src="$alfred_sync_abs/Alfred.alfredpreferences"
+  src="$alfred_src"
   dest="$new_repo/alfred/Alfred.alfredpreferences"
   if [[ -d "$src" ]]; then
     printf '%s' "$alfred_sync" > "$state/alfred-syncfolder.txt"
+    if [[ -f "$alfred_prefs" ]]; then
+      { cp -p "$alfred_prefs" "$state/alfred-prefs.json.tmp" && mv "$state/alfred-prefs.json.tmp" "$state/alfred-prefs.json"; } \
+        || fail "Could not back up $alfred_prefs"
+    fi
     [[ -d "$dest" ]] && { stash alfred "$dest" || fail "Could not move aside $dest"; }
     mkdir -p "$(dirname "$dest")"
     cp -pPR "$src" "$dest" || fail "Could not copy Alfred's preferences"
     cmp -s <(tree_manifest "$src") <(tree_manifest "$dest") || fail "Copy of Alfred's preferences doesn't match."
     defaults write com.runningwithcrayons.Alfred-Preferences syncfolder "~/src/dotfiles-new/alfred" \
       || fail "Could not change Alfred's sync folder"
+    if [[ -f "$alfred_prefs" ]]; then
+      alfred_use_new_repo "$dest" || fail "Could not point $alfred_prefs at $dest"
+    fi
     log "Moved Alfred's sync folder to ~/src/dotfiles-new/alfred"
   fi
 fi
