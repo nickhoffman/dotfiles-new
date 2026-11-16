@@ -6,7 +6,6 @@
 set -euo pipefail
 gems=(awesome_print pp)
 for b in /opt/homebrew/bin/brew /usr/local/bin/brew; do [[ -x $b ]] && eval "$("$b" shellenv)" && break; done
-export HOMEBREW_NO_AUTO_UPDATE=1
 brew upgrade asdf 2>/dev/null || brew install asdf
 export PATH="${ASDF_DATA_DIR:-$HOME/.asdf}/shims:$PATH"
 asdf plugin list 2>/dev/null | grep -qx ruby || asdf plugin add ruby
