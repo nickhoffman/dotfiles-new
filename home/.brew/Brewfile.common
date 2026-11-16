@@ -19,3 +19,12 @@ brew "tree"
 brew "prettier"
 brew "libmagic"
 brew "blueutil"
+
+# Mac apps. An app that's already in /Applications but wasn't installed by
+# Homebrew is adopted instead of failing the install. That works whatever its
+# version, because every one of these casks updates itself (auto_updates).
+cask_args adopt: true
+cask "alt-tab"
+cask "handy"
+cask "alfred"
+cask "cleanshot"

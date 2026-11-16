@@ -1,2 +1,4 @@
-# Homebrew packages and casks for the personal Mac only. Empty for now.
-# Example: cask "bettertouchtool"
+# Homebrew packages and casks for the personal Mac only.
+# The `cask_args adopt: true` in Brewfile.common applies here too.
+cask "bettertouchtool"
+cask "flux-app"
