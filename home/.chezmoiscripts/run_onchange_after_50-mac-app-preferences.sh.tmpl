@@ -18,4 +18,22 @@ else
   defaults import {{ . }} "$prefs/{{ . }}.plist" && echo "{{ . }}: imported preferences"
 fi
 {{- end }}
+
+# Alfred 5 reads its preferences folder from prefs.json, not from the
+# syncfolder default imported above. Point a new Mac at the repo's copy.
+alfred_prefs="$HOME/Library/Application Support/Alfred/prefs.json"
+alfred_bundle="{{ .chezmoi.workingTree }}/alfred/Alfred.alfredpreferences"
+if [[ -f "$alfred_prefs" ]]; then
+  echo "Alfred: prefs.json exists, leaving it alone"
+elif [[ ! -d "$alfred_bundle" ]]; then
+  echo "WARNING: $alfred_bundle is missing; not setting Alfred's preferences folder." >&2
+elif pgrep -x Alfred > /dev/null; then
+  echo "WARNING: Alfred is running; quit it and re-run chezmoi apply to set its preferences folder." >&2
+else
+  alfred_folder=$(dirname "$alfred_bundle")
+  case "$alfred_folder" in "$HOME"/*) alfred_folder_short="~${alfred_folder#"$HOME"}" ;; *) alfred_folder_short="$alfred_folder" ;; esac
+  mkdir -p "$(dirname "$alfred_prefs")"
+  printf '{"current":"%s","syncfolders":{"5":"%s"}}\n' "$alfred_bundle" "$alfred_folder_short" > "$alfred_prefs" \
+    && echo "Alfred: preferences folder set to $alfred_folder"
+fi
 {{ end -}}
