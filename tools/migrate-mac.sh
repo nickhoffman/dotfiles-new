@@ -218,7 +218,6 @@ mkdir -p "$state" || exit 1
 log "Migration state, backups and log: $state"
 
 for b in /opt/homebrew/bin/brew /usr/local/bin/brew; do [[ -x $b ]] && eval "$("$b" shellenv)" && break; done
-export HOMEBREW_NO_AUTO_UPDATE=1
 
 ### Preflight (read-only)
 log "Preflight checks"
