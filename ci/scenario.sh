@@ -48,6 +48,12 @@ case "$scenario" in
     check "/usr/local/bin/git-wtf link is gone" test ! -e /usr/local/bin/git-wtf
     check "ruby comes from asdf" zsh_ok '[[ $(command -v ruby) == *asdf* ]] && ruby -e "require %q(awesome_print)"'
     check "Homebrew packages are installed" zsh_ok 'command -v tmux && command -v tmuxp && command -v tree'
+    check "Mac apps for every Mac are installed" casks_installed "${common_casks[@]}"
+    if [[ $profile == personal ]]; then
+      check "personal Mac apps are installed" casks_installed "${personal_casks[@]}"
+    else
+      check "personal Mac apps are not installed" none_installed "${personal_casks[@]}"
+    fi
     check "statusline script no longer points into the old repo" grep -q 'caveman_script="$HOME/.claude/plugins/' "$HOME/.claude/statusline-command.sh"
     check "Claude Code settings are byte-for-byte unchanged" same_file "$settings_before" "$HOME/.claude/settings.json"
     check "Alfred syncs to the new repo" test "$(defaults read com.runningwithcrayons.Alfred-Preferences syncfolder)" = "~/src/dotfiles-new/alfred"

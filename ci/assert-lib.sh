@@ -40,4 +40,9 @@ idempotent_apply() {
   if [[ -n "$status" ]]; then echo "  chezmoi status after a second apply:" >&2; echo "$status" >&2; return 1; fi
 }
 zsh_ok() { perl -e 'alarm 90; exec @ARGV' zsh -i -c "$1" < /dev/null; }
+# Mac apps that every Mac gets, and the extra ones only the personal Mac gets.
+common_casks=(alt-tab handy alfred cleanshot)
+personal_casks=(bettertouchtool flux-app)
+casks_installed() { brew list --cask "$@"; }
+none_installed() { local c; for c in "$@"; do ! brew list --cask "$c" > /dev/null 2>&1 || { echo "  $c is installed" >&2; return 1; }; done; }
 finish() { echo "$failures check(s) failed."; exit $(( failures > 0 )); }
