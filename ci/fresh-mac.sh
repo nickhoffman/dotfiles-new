@@ -26,6 +26,10 @@ check "the existing Handy app was adopted" test -d /Applications/Handy.app
 check "Claude Code settings were created" grep -q '"model": "opus"' "$HOME/.claude/settings.json"
 check "Rectangle preferences were imported" defaults read com.knollsoft.Rectangle
 check "Alfred syncs to the new repo" test "$(defaults read com.runningwithcrayons.Alfred-Preferences syncfolder)" = "~/src/dotfiles-new/alfred"
+# Alfred 5 reads its sync folder from prefs.json; the default above is only a copy.
+alfred_prefs="$HOME/Library/Application Support/Alfred/prefs.json"
+check "Alfred uses the preferences in the new repo" test "$(plutil -extract current raw "$alfred_prefs")" = "$HOME/src/dotfiles-new/alfred/Alfred.alfredpreferences"
+check "Alfred 5 syncs to the new repo" test "$(plutil -extract syncfolders.5 raw "$alfred_prefs")" = "~/src/dotfiles-new/alfred"
 check "work-only preferences were not imported" test -z "$(defaults read com.stripe.jil.meetingbar 2>/dev/null)"
 check "VS Code key repeat is enabled" test "$(defaults read com.microsoft.VSCode ApplePressAndHoldEnabled)" = 0
 finish
