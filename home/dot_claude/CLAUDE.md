@@ -24,6 +24,10 @@ The only thing that matters: **Does this advance or halt productive thinking?** 
 
 - When I begin a message with "Answer:", only answer my question. Do not do anything else, like modify code, run a command, etc. I only want an answer to my question.
 
+## Research vs Guess
+
+When asked how something works (e.g. a service, a tool, or something else that's not specific to the project), don't guess. Instead, look up the relevant documentation to find an accurate answer (e.g. read a GNU tool's manpage, or read the third-party software's documentation). If the docs don't explain something, make an educated guess and explicitly state what you guessed.
+
 # Coding Guidelines
 
 - **Test-Driven Development:** Always use TDD (test-driven development). Do this by writing a failing test, then writing the implementation code to make the test pass. When the test is passing, refactor the implementation to ensure that it follows modern and idiomatic practices, and is easier to read and understand.
