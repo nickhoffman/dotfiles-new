@@ -26,7 +26,26 @@ alfred_prefs="$HOME/Library/Application Support/Alfred/prefs.json"
 cp "$alfred_prefs" "$out/alfred-prefs-before.json"
 alfred_pref() { plutil -extract "$1" raw "$alfred_prefs"; }
 
-# Prints the path of the ~/.zshrc a profile should get: the old repo's, and on
+# The old repo's ~/.zshrc, loading Powerlevel10k from wherever Homebrew put it.
+shared_zshrc() {
+  local line old='source "$HOMEBREW_PREFIX/opt/powerlevel10k/powerlevel10k.zsh-theme"'
+  while IFS= read -r line; do
+    if [[ $line == "$old" ]]; then
+      cat <<'P10K'
+# Homebrew's powerlevel10k formula puts the theme in share/; the old
+# romkatv/powerlevel10k tap's formula puts it at the top of its keg.
+for p10k_theme in "$HOMEBREW_PREFIX"/{share,opt}/powerlevel10k/powerlevel10k.zsh-theme; do
+  [[ -f $p10k_theme ]] && { source "$p10k_theme"; break; }
+done
+unset p10k_theme
+P10K
+    else
+      printf '%s\n' "$line"
+    fi
+  done < "$HOME/src/dotfiles/home/.zshrc"
+}
+
+# Prints the path of the ~/.zshrc a profile should get: the shared one, and on
 # the work Mac, wrapped in the Stripe config that Chef and island add there.
 expected_zshrc() { # profile
   local f="$out/expected-zshrc-$1"
@@ -48,7 +67,7 @@ if [[ -f ~/.stripe/shellinit/zshrc ]]; then
 fi
 ### END STRIPE
 TOP
-      cat "$HOME/src/dotfiles/home/.zshrc"
+      shared_zshrc
       cat <<'BOTTOM'
 
 # island shell integration
@@ -56,7 +75,7 @@ TOP
 BOTTOM
     } > "$f"
   else
-    cp "$HOME/src/dotfiles/home/.zshrc" "$f"
+    shared_zshrc > "$f"
   fi
   echo "$f"
 }
