@@ -79,6 +79,7 @@ case "$scenario" in
     check "chezmoi verify passes" chezmoi verify
     check "a second chezmoi apply changes nothing" idempotent_apply
     check "zsh starts cleanly" zsh_ok 'exit 0'
+    check "Powerlevel10k loads" zsh_ok "(( \$+functions[p10k] ))"
     check "~/.zshrc is the $profile one" same_file "$(expected_zshrc "$profile")" "$HOME/.zshrc"
     check "git-wtf runs from ~/.local/bin" zsh_ok '[[ $(command -v git-wtf) == $HOME/.local/bin/git-wtf ]]'
     check "/usr/local/bin/git-wtf link is gone" test ! -e /usr/local/bin/git-wtf
@@ -112,6 +113,7 @@ case "$scenario" in
     check "Alfred's sync folder is restored" test "$(defaults read com.runningwithcrayons.Alfred-Preferences syncfolder)" = "$alfred_before"
     check "Alfred's prefs.json is restored" same_file "$out/alfred-prefs-before.json" "$alfred_prefs"
     check "zsh starts cleanly" zsh_ok 'exit 0'
+    check "Powerlevel10k loads" zsh_ok "(( \$+functions[p10k] ))"
     diff "$out/before/home-entries.txt" "$out/after/home-entries.txt"
     ;;
   abort-local-edit)

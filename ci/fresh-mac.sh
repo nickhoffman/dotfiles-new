@@ -36,6 +36,7 @@ check "brew update runs before brew bundle" updated_before_bundle "$RUNNER_TEMP/
 check "chezmoi verify passes" chezmoi verify
 check "a second chezmoi apply changes nothing" idempotent_apply
 check "zsh starts cleanly" zsh_ok 'exit 0'
+check "Powerlevel10k loads" zsh_ok "(( \$+functions[p10k] ))"
 check "oh-my-zsh is installed" test -d "$HOME/.oh-my-zsh"
 check "ruby comes from the latest asdf" zsh_ok '[[ $(command -v ruby) == *asdf* ]] && ruby -e "require %q(awesome_print)"'
 check "Homebrew packages are installed" zsh_ok 'command -v tmux && command -v tmuxp && command -v tree && command -v git-wtf'
