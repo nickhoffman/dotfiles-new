@@ -165,10 +165,6 @@ alias cz='/usr/local/stripe/bin/chef-zero'
 alias cookit='tc && cz'
 # STOP - Managed by chef cookbook stripe_cpe_bin
 {{ if eq .profile "work" }}
-if [[ -f ~/.stripe/shellinit/zshrc ]]; then
-  source ~/.stripe/shellinit/zshrc
-fi
-
 # island shell integration
 [[ -f "$HOME/.config/island/island-shell-integration.zsh" ]] && source "$HOME/.config/island/island-shell-integration.zsh"
 {{ end -}}
