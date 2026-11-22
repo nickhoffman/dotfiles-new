@@ -26,6 +26,45 @@ alfred_prefs="$HOME/Library/Application Support/Alfred/prefs.json"
 cp "$alfred_prefs" "$out/alfred-prefs-before.json"
 alfred_pref() { plutil -extract "$1" raw "$alfred_prefs"; }
 
+# Prints the path of the ~/.zshrc a profile should get: the old repo's, and on
+# the work Mac, wrapped in the Stripe config that Chef and island add there.
+expected_zshrc() { # profile
+  local f="$out/expected-zshrc-$1"
+  if [[ $1 == work ]]; then
+    {
+      cat <<'TOP'
+### BEGIN STRIPE
+# All Stripe related shell configuration
+# is at ~/.stripe/shellinit/zshrc and is
+# persistently managed by Chef. You shouldn't
+# remove this unless you don't want to load
+# Stripe specific shell configurations.
+#
+# Feel free to add your customizations in this
+# file (~/.zshrc) after the Stripe config
+# is sourced.
+if [[ -f ~/.stripe/shellinit/zshrc ]]; then
+  source ~/.stripe/shellinit/zshrc
+fi
+### END STRIPE
+TOP
+      cat "$HOME/src/dotfiles/home/.zshrc"
+      cat <<'BOTTOM'
+
+if [[ -f ~/.stripe/shellinit/zshrc ]]; then
+  source ~/.stripe/shellinit/zshrc
+fi
+
+# island shell integration
+[[ -f "$HOME/.config/island/island-shell-integration.zsh" ]] && source "$HOME/.config/island/island-shell-integration.zsh"
+BOTTOM
+    } > "$f"
+  else
+    cp "$HOME/src/dotfiles/home/.zshrc" "$f"
+  fi
+  echo "$f"
+}
+
 case "$scenario" in
   migrate-personal|migrate-work)
     profile=${scenario#migrate-}
@@ -44,6 +83,7 @@ case "$scenario" in
     check "chezmoi verify passes" chezmoi verify
     check "a second chezmoi apply changes nothing" idempotent_apply
     check "zsh starts cleanly" zsh_ok 'exit 0'
+    check "~/.zshrc is the $profile one" same_file "$(expected_zshrc "$profile")" "$HOME/.zshrc"
     check "git-wtf runs from ~/.local/bin" zsh_ok '[[ $(command -v git-wtf) == $HOME/.local/bin/git-wtf ]]'
     check "/usr/local/bin/git-wtf link is gone" test ! -e /usr/local/bin/git-wtf
     check "ruby comes from asdf" zsh_ok '[[ $(command -v ruby) == *asdf* ]] && ruby -e "require %q(awesome_print)"'
