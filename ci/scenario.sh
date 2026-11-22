@@ -51,10 +51,6 @@ TOP
       cat "$HOME/src/dotfiles/home/.zshrc"
       cat <<'BOTTOM'
 
-if [[ -f ~/.stripe/shellinit/zshrc ]]; then
-  source ~/.stripe/shellinit/zshrc
-fi
-
 # island shell integration
 [[ -f "$HOME/.config/island/island-shell-integration.zsh" ]] && source "$HOME/.config/island/island-shell-integration.zsh"
 BOTTOM
