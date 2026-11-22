@@ -19,6 +19,7 @@ brew "tree"
 brew "prettier"
 brew "libmagic"
 brew "blueutil"
+brew "pandoc"
 
 # Mac apps. An app that's already in /Applications but wasn't installed by
 # Homebrew is adopted instead of failing the install. That works whatever its
