@@ -1,0 +1,169 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>bundleid</key>
+	<string></string>
+	<key>connections</key>
+	<dict>
+		<key>580AB007-BF93-4382-B4E2-A854C4CC7332</key>
+		<array>
+			<dict>
+				<key>destinationuid</key>
+				<string>EE22A8AC-85F8-44F5-A3B0-C925AE01B158</string>
+				<key>modifiers</key>
+				<integer>0</integer>
+				<key>modifiersubtext</key>
+				<string></string>
+				<key>vitoclose</key>
+				<false/>
+			</dict>
+		</array>
+		<key>EE22A8AC-85F8-44F5-A3B0-C925AE01B158</key>
+		<array>
+			<dict>
+				<key>destinationuid</key>
+				<string>7C7EB017-478C-40F6-802A-AF8BC55387FF</string>
+				<key>modifiers</key>
+				<integer>0</integer>
+				<key>modifiersubtext</key>
+				<string></string>
+				<key>vitoclose</key>
+				<false/>
+			</dict>
+		</array>
+	</dict>
+	<key>createdby</key>
+	<string>Nick Hoffman</string>
+	<key>description</key>
+	<string></string>
+	<key>disabled</key>
+	<false/>
+	<key>name</key>
+	<string>Misc</string>
+	<key>objects</key>
+	<array>
+		<dict>
+			<key>config</key>
+			<dict>
+				<key>autopaste</key>
+				<false/>
+				<key>clipboardtext</key>
+				<string>{query}</string>
+				<key>ignoredynamicplaceholders</key>
+				<false/>
+				<key>transient</key>
+				<false/>
+			</dict>
+			<key>type</key>
+			<string>alfred.workflow.output.clipboard</string>
+			<key>uid</key>
+			<string>7C7EB017-478C-40F6-802A-AF8BC55387FF</string>
+			<key>version</key>
+			<integer>3</integer>
+		</dict>
+		<dict>
+			<key>config</key>
+			<dict>
+				<key>concurrently</key>
+				<false/>
+				<key>escaping</key>
+				<integer>102</integer>
+				<key>script</key>
+				<string>export PATH="/opt/homebrew/bin:/usr/local/bin:$PATH"
+
+# Convert HTML cleanly without raw spans and format bold/italics
+convert_html() {
+  pandoc -f html -t commonmark-raw_html --wrap=none | \
+    perl -pe '
+      s/\*\*(.+?)\*\*/\x01$1\x01/g; # Temporarily mark bold
+      s/\*(.+?)\*/_$1_/g;        # Change *italics* to _italics_
+      s/\x01(.+?)\x01/*$1*/g;    # Change bold to *bold*
+    '
+}
+
+HTML_DATA=$(osascript -e 'the clipboard as «class HTML»' 2&gt;/dev/null)
+
+if [[ -n "$HTML_DATA" ]]; then
+  echo "$HTML_DATA" | \
+    perl -ne 'print chr foreach unpack("C*",pack("H*",substr($_,11,-3)))' | \
+    convert_html
+else
+  RTF_DATA=$(osascript -e 'the clipboard as «class RTF »' 2&gt;/dev/null)
+  if [[ -n "$RTF_DATA" ]]; then
+    echo "$RTF_DATA" | \
+      perl -ne 'print chr foreach unpack("C*",pack("H*",substr($_,10,-3)))' | \
+      textutil -stdin -stdout -convert html | \
+      convert_html
+  else
+    pbpaste
+  fi
+fi</string>
+				<key>scriptargtype</key>
+				<integer>1</integer>
+				<key>scriptfile</key>
+				<string></string>
+				<key>type</key>
+				<integer>11</integer>
+			</dict>
+			<key>type</key>
+			<string>alfred.workflow.action.script</string>
+			<key>uid</key>
+			<string>EE22A8AC-85F8-44F5-A3B0-C925AE01B158</string>
+			<key>version</key>
+			<integer>2</integer>
+		</dict>
+		<dict>
+			<key>config</key>
+			<dict>
+				<key>argumenttype</key>
+				<integer>2</integer>
+				<key>keyword</key>
+				<string>md</string>
+				<key>subtext</key>
+				<string></string>
+				<key>text</key>
+				<string>Convert clipboard contents to Markdown</string>
+				<key>withspace</key>
+				<false/>
+			</dict>
+			<key>type</key>
+			<string>alfred.workflow.input.keyword</string>
+			<key>uid</key>
+			<string>580AB007-BF93-4382-B4E2-A854C4CC7332</string>
+			<key>version</key>
+			<integer>1</integer>
+		</dict>
+	</array>
+	<key>readme</key>
+	<string></string>
+	<key>uidata</key>
+	<dict>
+		<key>580AB007-BF93-4382-B4E2-A854C4CC7332</key>
+		<dict>
+			<key>xpos</key>
+			<real>35</real>
+			<key>ypos</key>
+			<real>30</real>
+		</dict>
+		<key>7C7EB017-478C-40F6-802A-AF8BC55387FF</key>
+		<dict>
+			<key>xpos</key>
+			<real>370</real>
+			<key>ypos</key>
+			<real>30</real>
+		</dict>
+		<key>EE22A8AC-85F8-44F5-A3B0-C925AE01B158</key>
+		<dict>
+			<key>xpos</key>
+			<real>205</real>
+			<key>ypos</key>
+			<real>30</real>
+		</dict>
+	</dict>
+	<key>userconfigurationconfig</key>
+	<array/>
+	<key>webaddress</key>
+	<string></string>
+</dict>
+</plist>
