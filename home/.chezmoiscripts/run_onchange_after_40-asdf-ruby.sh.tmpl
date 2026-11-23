@@ -1,4 +1,5 @@
-{{- if eq .chezmoi.os "darwin" -}}
+{{- /* Not on the work Mac: its Santa blocks any Ruby built on it. */ -}}
+{{- if and (eq .chezmoi.os "darwin") (ne .profile "work") -}}
 #!/bin/bash
 # Keeps asdf on its latest version and makes sure a global Ruby and the gems
 # from the old .ruby_gems_to_install exist. A Ruby version that's already set
