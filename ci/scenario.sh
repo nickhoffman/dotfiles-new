@@ -80,6 +80,16 @@ BOTTOM
   echo "$f"
 }
 
+# True if the brew bundle install script installs a formula on this Mac's
+# profile. The work Mac gets git from Stripe's git-stripe, which conflicts
+# with Homebrew's git.
+bundle_has_formula() { # formula
+  chezmoi execute-template < "$HOME/src/dotfiles-new/home/.chezmoiscripts/run_onchange_after_20-brew-bundle.sh.tmpl" |
+    sed -n '/^brew bundle/,/^BREWFILE$/p' | sed '1d;$d' |
+    brew bundle list --formula --file=- | grep -qx "$1"
+}
+not() { ! "$@"; }
+
 case "$scenario" in
   migrate-personal|migrate-work)
     profile=${scenario#migrate-}
@@ -107,8 +117,10 @@ case "$scenario" in
     check "Mac apps for every Mac are installed" casks_installed "${common_casks[@]}"
     if [[ $profile == personal ]]; then
       check "personal Mac apps are installed" casks_installed "${personal_casks[@]}"
+      check "Homebrew's git is in the Brewfile" bundle_has_formula git
     else
       check "personal Mac apps are not installed" none_installed "${personal_casks[@]}"
+      check "Homebrew's git is left to git-stripe" not bundle_has_formula git
     fi
     check "statusline script no longer points into the old repo" grep -q 'caveman_script="$HOME/.claude/plugins/' "$HOME/.claude/statusline-command.sh"
     check "Claude Code settings are byte-for-byte unchanged" same_file "$settings_before" "$HOME/.claude/settings.json"
