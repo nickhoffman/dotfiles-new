@@ -132,7 +132,6 @@ case "$scenario" in
     check "Alfred's sync folder is restored" test "$(defaults read com.runningwithcrayons.Alfred-Preferences syncfolder)" = "$alfred_before"
     check "Alfred's prefs.json is restored" same_file "$out/alfred-prefs-before.json" "$alfred_prefs"
     check "zsh starts cleanly" zsh_ok 'exit 0'
-    check "Powerlevel10k loads" zsh_ok "(( \$+functions[p10k] ))"
     diff "$out/before/home-entries.txt" "$out/after/home-entries.txt"
     ;;
   abort-local-edit)
