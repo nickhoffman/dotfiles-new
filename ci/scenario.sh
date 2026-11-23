@@ -80,15 +80,20 @@ BOTTOM
   echo "$f"
 }
 
-# True if the brew bundle install script installs a formula on this Mac's
-# profile. The work Mac gets git from Stripe's git-stripe, which conflicts
-# with Homebrew's git.
-bundle_has_formula() { # formula
-  chezmoi execute-template < "$HOME/src/dotfiles-new/home/.chezmoiscripts/run_onchange_after_20-brew-bundle.sh.tmpl" |
-    sed -n '/^brew bundle/,/^BREWFILE$/p' | sed '1d;$d' |
-    brew bundle list --formula --file=- | grep -qx "$1"
+# Formulae the brew bundle install script installs on this Mac's profile.
+# The work Mac gets git from Stripe's git-stripe, which conflicts with
+# Homebrew's git.
+bundle_formulae() {
+  local script formulae
+  script=$(chezmoi execute-template < "$HOME/src/dotfiles-new/home/.chezmoiscripts/run_onchange_after_20-brew-bundle.sh.tmpl") || return 1
+  formulae=$(sed -n '/^brew bundle/,/^BREWFILE$/p' <<< "$script" | sed '1d;$d' | brew bundle list --formula --file=-) || return 1
+  [[ -n $formulae ]] || { echo "  the Brewfile lists no formulae" >&2; return 1; }
+  echo "$formulae"
 }
-not() { ! "$@"; }
+# Reads the whole list before matching: with pipefail, `grep -q` exiting early
+# can fail the pipeline with SIGPIPE.
+bundle_has_formula() { local f; f=$(bundle_formulae) && grep -qx "$1" <<< "$f"; }
+bundle_lacks_formula() { local f; f=$(bundle_formulae) && ! grep -qx "$1" <<< "$f"; }
 
 case "$scenario" in
   migrate-personal|migrate-work)
@@ -120,7 +125,7 @@ case "$scenario" in
       check "Homebrew's git is in the Brewfile" bundle_has_formula git
     else
       check "personal Mac apps are not installed" none_installed "${personal_casks[@]}"
-      check "Homebrew's git is left to git-stripe" not bundle_has_formula git
+      check "Homebrew's git is left to git-stripe" bundle_lacks_formula git
     fi
     check "statusline script no longer points into the old repo" grep -q 'caveman_script="$HOME/.claude/plugins/' "$HOME/.claude/statusline-command.sh"
     check "Claude Code settings are byte-for-byte unchanged" same_file "$settings_before" "$HOME/.claude/settings.json"
