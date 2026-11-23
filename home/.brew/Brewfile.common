@@ -3,7 +3,6 @@
 # upgraded or removed.
 brew "zsh"
 brew "wget"
-brew "git"
 brew "md5sha1sum"
 brew "vim"
 brew "ruby"
