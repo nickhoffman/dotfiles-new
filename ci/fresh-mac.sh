@@ -41,6 +41,7 @@ check "oh-my-zsh is installed" test -d "$HOME/.oh-my-zsh"
 check "ruby comes from the latest asdf" zsh_ok '[[ $(command -v ruby) == *asdf* ]] && ruby -e "require %q(awesome_print)"'
 check "Homebrew packages are installed" zsh_ok 'command -v tmux && command -v tmuxp && command -v tree && command -v git-wtf'
 check "Mac apps are installed" casks_installed "${common_casks[@]}" "${personal_casks[@]}"
+check "CleanShot is not installed" none_installed cleanshot
 check "the existing Handy app was adopted" test -d /Applications/Handy.app
 check "Claude Code settings were created" grep -q '"model": "opus"' "$HOME/.claude/settings.json"
 check "Rectangle preferences were imported" defaults read com.knollsoft.Rectangle

@@ -80,20 +80,27 @@ BOTTOM
   echo "$f"
 }
 
-# Formulae the brew bundle install script installs on this Mac's profile.
-# The work Mac gets git from Stripe's git-stripe, which conflicts with
-# Homebrew's git.
-bundle_formulae() {
-  local script formulae
+# Formulae (--formula) or casks (--cask) the brew bundle install script installs
+# on this Mac's profile. The work Mac gets git from Stripe's git-stripe, which
+# conflicts with Homebrew's git.
+bundle_list() {
+  local script entries
   script=$(chezmoi execute-template < "$HOME/src/dotfiles-new/home/.chezmoiscripts/run_onchange_after_20-brew-bundle.sh.tmpl") || return 1
-  formulae=$(sed -n '/^brew bundle/,/^BREWFILE$/p' <<< "$script" | sed '1d;$d' | brew bundle list --formula --file=-) || return 1
-  [[ -n $formulae ]] || { echo "  the Brewfile lists no formulae" >&2; return 1; }
-  echo "$formulae"
+  entries=$(sed -n '/^brew bundle/,/^BREWFILE$/p' <<< "$script" | sed '1d;$d' | brew bundle list "$1" --file=-) || return 1
+  [[ -n $entries ]] || { echo "  the Brewfile lists nothing for $1" >&2; return 1; }
+  echo "$entries"
 }
 # Reads the whole list before matching: with pipefail, `grep -q` exiting early
 # can fail the pipeline with SIGPIPE.
-bundle_has_formula() { local f; f=$(bundle_formulae) && grep -qx "$1" <<< "$f"; }
-bundle_lacks_formula() { local f; f=$(bundle_formulae) && ! grep -qx "$1" <<< "$f"; }
+bundle_has_formula() { local f; f=$(bundle_list --formula) && grep -qx "$1" <<< "$f"; }
+bundle_lacks_formula() { local f; f=$(bundle_list --formula) && ! grep -qx "$1" <<< "$f"; }
+bundle_lacks_cask() { local f; f=$(bundle_list --cask) && ! grep -qx "$1" <<< "$f"; }
+# True if the app preferences script doesn't import this domain on this Mac's profile.
+prefs_script_lacks() {
+  local script
+  script=$(chezmoi execute-template < "$HOME/src/dotfiles-new/home/.chezmoiscripts/run_onchange_after_50-mac-app-preferences.sh.tmpl") || return 1
+  ! grep -qF "$1" <<< "$script"
+}
 # True if the asdf Ruby install script renders to nothing on this Mac's profile,
 # so chezmoi has nothing to run. The work Mac's Santa blocks Rubies built on it.
 asdf_ruby_script_is_empty() {
@@ -126,6 +133,8 @@ case "$scenario" in
     check "/usr/local/bin/git-wtf link is gone" test ! -e /usr/local/bin/git-wtf
     check "Homebrew packages are installed" zsh_ok 'command -v tmux && command -v tmuxp && command -v tree'
     check "Mac apps for every Mac are installed" casks_installed "${common_casks[@]}"
+    check "CleanShot is not in the Brewfile" bundle_lacks_cask cleanshot
+    check "CleanShot preferences are not imported" prefs_script_lacks pl.maketheweb.cleanshotx
     if [[ $profile == personal ]]; then
       check "personal Mac apps are installed" casks_installed "${personal_casks[@]}"
       check "Homebrew's git is in the Brewfile" bundle_has_formula git
