@@ -110,7 +110,9 @@ asdf_ruby_script_is_empty() {
 }
 # The manual-install reminders script, rendered for this Mac's profile.
 reminders_script() { chezmoi execute-template < "$HOME/src/dotfiles-new/home/.chezmoiscripts/run_onchange_after_70-manual-install-reminders.sh.tmpl"; }
-reminders_script_has() { local s; s=$(reminders_script) && grep -qF "$1" <<< "$s"; }
+# True if running the reminders script prints $1. CI runners lack these apps, so
+# every reminder fires.
+reminders_script_prints() { local s; s=$(reminders_script) && bash -c "$s" 2>&1 | grep -qF "$1"; }
 reminders_script_lacks() { local s; s=$(reminders_script) && ! grep -qF "$1" <<< "$s"; }
 
 case "$scenario" in
@@ -144,8 +146,8 @@ case "$scenario" in
       check "personal Mac apps are installed" casks_installed "${personal_casks[@]}"
       check "Homebrew's git is in the Brewfile" bundle_has_formula git
       check "ruby comes from asdf" zsh_ok '[[ $(command -v ruby) == *asdf* ]] && ruby -e "require %q(awesome_print)"'
-      check "chezmoi reminds me to install BetterTouchTool" reminders_script_has "Download BetterTouchTool"
-      check "chezmoi reminds me to install Monosnap" reminders_script_has "Download Monosnap"
+      check "chezmoi reminds me to install BetterTouchTool" reminders_script_prints "Download BetterTouchTool"
+      check "chezmoi reminds me to install Monosnap" reminders_script_prints "Download Monosnap"
     else
       check "personal Mac apps are not installed" none_installed "${personal_casks[@]}"
       check "Homebrew's git is left to git-stripe" bundle_lacks_formula git
