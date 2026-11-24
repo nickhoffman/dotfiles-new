@@ -1,7 +1,7 @@
 {{- if eq .chezmoi.os "darwin" -}}
 {{- $apps := list "com.knollsoft.Rectangle" "com.lwouis.alt-tab-macos" "com.runningwithcrayons.Alfred-Preferences" "com.surteesstudios.Bartender" -}}
 {{- if eq .profile "work" -}}
-{{-   $apps = concat $apps (list "com.stripe.jil.meetingbar" "pl.maketheweb.cleanshotx") -}}
+{{-   $apps = concat $apps (list "com.stripe.jil.meetingbar") -}}
 {{- end -}}
 #!/bin/bash
 # Imports saved app preferences on a Mac that has none for that app yet. Never
