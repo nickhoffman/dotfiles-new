@@ -1,8 +1,12 @@
 {{- /* Apps to install by hand. Runs last so its output isn't buried. */ -}}
 {{- if and (eq .chezmoi.os "darwin") (eq .profile "personal") -}}
 #!/bin/bash
+# Prints a reminder for each app that isn't in /Applications yet.
+remind() { # app download-url
+  [[ -d "/Applications/$1.app" ]] || echo "REMINDER: Download $1 from $2 and install it by hand." >&2
+}
 # BetterTouchTool's developer recommends not installing it with Homebrew.
-if [[ ! -d /Applications/BetterTouchTool.app ]]; then
-  echo "REMINDER: Download BetterTouchTool from https://folivora.ai and install it by hand." >&2
-fi
+remind BetterTouchTool https://folivora.ai
+# Homebrew has no Monosnap cask.
+remind Monosnap https://monosnap.ai/download
 {{ end -}}

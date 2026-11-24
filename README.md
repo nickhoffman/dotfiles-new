@@ -43,9 +43,12 @@ brew install chezmoi
 DOTFILES_PROFILE=personal chezmoi init --apply --source ~/src/dotfiles-new nickhoffman/dotfiles-new
 ```
 
-On the personal Mac, download [BetterTouchTool](https://folivora.ai) and install
-it by hand: its developer recommends not installing it with Homebrew. Setup prints a
-reminder if it's missing.
+On the personal Mac, download and install these by hand. Setup prints a reminder
+for each one that's missing.
+
+- [BetterTouchTool](https://folivora.ai): its developer recommends not
+  installing it with Homebrew.
+- [Monosnap](https://monosnap.ai/download): Homebrew doesn't have it.
 
 **Mac that uses the old `linker.sh` dotfiles:** see [Migrating a Mac](#migrating-a-mac).
 
