@@ -108,6 +108,10 @@ asdf_ruby_script_is_empty() {
   script=$(chezmoi execute-template < "$HOME/src/dotfiles-new/home/.chezmoiscripts/run_onchange_after_40-asdf-ruby.sh.tmpl") || return 1
   [[ -z $script ]]
 }
+# The manual-install reminders script, rendered for this Mac's profile.
+reminders_script() { chezmoi execute-template < "$HOME/src/dotfiles-new/home/.chezmoiscripts/run_onchange_after_70-manual-install-reminders.sh.tmpl"; }
+reminders_script_has() { local s; s=$(reminders_script) && grep -qF "$1" <<< "$s"; }
+reminders_script_lacks() { local s; s=$(reminders_script) && ! grep -qF "$1" <<< "$s"; }
 
 case "$scenario" in
   migrate-personal|migrate-work)
@@ -135,14 +139,17 @@ case "$scenario" in
     check "Mac apps for every Mac are installed" casks_installed "${common_casks[@]}"
     check "CleanShot is not in the Brewfile" bundle_lacks_cask cleanshot
     check "CleanShot preferences are not imported" prefs_script_lacks pl.maketheweb.cleanshotx
+    check "BetterTouchTool is not in the Brewfile" bundle_lacks_cask bettertouchtool
     if [[ $profile == personal ]]; then
       check "personal Mac apps are installed" casks_installed "${personal_casks[@]}"
       check "Homebrew's git is in the Brewfile" bundle_has_formula git
       check "ruby comes from asdf" zsh_ok '[[ $(command -v ruby) == *asdf* ]] && ruby -e "require %q(awesome_print)"'
+      check "chezmoi reminds me to install BetterTouchTool" reminders_script_has "Download BetterTouchTool"
     else
       check "personal Mac apps are not installed" none_installed "${personal_casks[@]}"
       check "Homebrew's git is left to git-stripe" bundle_lacks_formula git
       check "the asdf Ruby script doesn't run" asdf_ruby_script_is_empty
+      check "chezmoi doesn't remind me to install BetterTouchTool" reminders_script_lacks BetterTouchTool
     fi
     check "statusline script no longer points into the old repo" grep -q 'caveman_script="$HOME/.claude/plugins/' "$HOME/.claude/statusline-command.sh"
     check "Claude Code settings are byte-for-byte unchanged" same_file "$settings_before" "$HOME/.claude/settings.json"

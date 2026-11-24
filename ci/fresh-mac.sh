@@ -28,7 +28,8 @@ in_log() { grep -q "$1" "$2"; }
 
 started=$(date +%s)
 BREW_LOG="$RUNNER_TEMP/brew-init.log" PATH="$shim:$PATH" \
-  DOTFILES_PROFILE=personal chezmoi init --apply --source "$HOME/src/dotfiles-new" < /dev/null; status=$?
+  DOTFILES_PROFILE=personal chezmoi init --apply --source "$HOME/src/dotfiles-new" < /dev/null 2>&1 | tee "$RUNNER_TEMP/init.log"
+status=${PIPESTATUS[0]}
 echo "Setup took $(( $(date +%s) - started ))s, exit status $status"
 
 check "chezmoi init --apply exits 0" test "$status" -eq 0
@@ -42,6 +43,8 @@ check "ruby comes from the latest asdf" zsh_ok '[[ $(command -v ruby) == *asdf* 
 check "Homebrew packages are installed" zsh_ok 'command -v tmux && command -v tmuxp && command -v tree && command -v git-wtf'
 check "Mac apps are installed" casks_installed "${common_casks[@]}" "${personal_casks[@]}"
 check "CleanShot is not installed" none_installed cleanshot
+check "BetterTouchTool is not installed" none_installed bettertouchtool
+check "chezmoi reminds me to install BetterTouchTool" grep -q "Download BetterTouchTool" "$RUNNER_TEMP/init.log"
 check "the existing Handy app was adopted" test -d /Applications/Handy.app
 check "Claude Code settings were created" grep -q '"model": "opus"' "$HOME/.claude/settings.json"
 check "Rectangle preferences were imported" defaults read com.knollsoft.Rectangle
