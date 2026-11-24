@@ -1,0 +1,8 @@
+{{- /* Apps to install by hand. Runs last so its output isn't buried. */ -}}
+{{- if and (eq .chezmoi.os "darwin") (eq .profile "personal") -}}
+#!/bin/bash
+# BetterTouchTool's developer recommends not installing it with Homebrew.
+if [[ ! -d /Applications/BetterTouchTool.app ]]; then
+  echo "REMINDER: Download BetterTouchTool from https://folivora.ai and install it by hand." >&2
+fi
+{{ end -}}

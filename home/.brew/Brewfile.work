@@ -1,3 +1,3 @@
 # Homebrew packages and casks for the work Mac only. Empty for now.
 # No `brew "git"`: Stripe's git-stripe provides git and conflicts with it.
-# Example: cask "bettertouchtool"
+# Example: cask "flux-app"

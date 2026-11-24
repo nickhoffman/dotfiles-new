@@ -2,5 +2,4 @@
 # The `cask_args adopt: true` in Brewfile.common applies here too.
 # The work Mac gets git from Stripe's git-stripe, which conflicts with this.
 brew "git"
-cask "bettertouchtool"
 cask "flux-app"
