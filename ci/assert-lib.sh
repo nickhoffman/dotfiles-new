@@ -41,7 +41,7 @@ idempotent_apply() {
 }
 zsh_ok() { perl -e 'alarm 90; exec @ARGV' zsh -i -c "$1" < /dev/null; }
 # Mac apps that every Mac gets, and the extra ones only the personal Mac gets.
-common_casks=(alt-tab handy alfred cleanshot ghostty rectangle bartender)
+common_casks=(alt-tab handy alfred ghostty rectangle bartender)
 personal_casks=(bettertouchtool flux-app)
 casks_installed() { brew list --cask "$@"; }
 none_installed() { local c; for c in "$@"; do ! brew list --cask "$c" > /dev/null 2>&1 || { echo "  $c is installed" >&2; return 1; }; done; }

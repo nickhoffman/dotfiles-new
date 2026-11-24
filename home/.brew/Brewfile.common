@@ -27,7 +27,6 @@ cask_args adopt: true
 cask "alt-tab"
 cask "handy"
 cask "alfred"
-cask "cleanshot"
 cask "ghostty"
 cask "rectangle"
 cask "bartender"
