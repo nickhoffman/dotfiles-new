@@ -111,8 +111,9 @@ asdf_ruby_script_is_empty() {
 # The manual-install reminders script, rendered for this Mac's profile.
 reminders_script() { chezmoi execute-template < "$HOME/src/dotfiles-new/home/.chezmoiscripts/run_onchange_after_70-manual-install-reminders.sh.tmpl"; }
 # True if running the reminders script prints $1. CI runners lack these apps, so
-# every reminder fires.
-reminders_script_prints() { local s; s=$(reminders_script) && bash -c "$s" 2>&1 | grep -qF "$1"; }
+# every reminder fires. Captures the output before matching: with pipefail,
+# `grep -q` exiting early can fail the pipeline with SIGPIPE.
+reminders_script_prints() { local s o; s=$(reminders_script) && o=$(bash -c "$s" 2>&1) && grep -qF "$1" <<< "$o"; }
 reminders_script_lacks() { local s; s=$(reminders_script) && ! grep -qF "$1" <<< "$s"; }
 
 case "$scenario" in
