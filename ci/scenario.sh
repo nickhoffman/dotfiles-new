@@ -145,11 +145,13 @@ case "$scenario" in
       check "Homebrew's git is in the Brewfile" bundle_has_formula git
       check "ruby comes from asdf" zsh_ok '[[ $(command -v ruby) == *asdf* ]] && ruby -e "require %q(awesome_print)"'
       check "chezmoi reminds me to install BetterTouchTool" reminders_script_has "Download BetterTouchTool"
+      check "chezmoi reminds me to install Monosnap" reminders_script_has "Download Monosnap"
     else
       check "personal Mac apps are not installed" none_installed "${personal_casks[@]}"
       check "Homebrew's git is left to git-stripe" bundle_lacks_formula git
       check "the asdf Ruby script doesn't run" asdf_ruby_script_is_empty
       check "chezmoi doesn't remind me to install BetterTouchTool" reminders_script_lacks BetterTouchTool
+      check "chezmoi doesn't remind me to install Monosnap" reminders_script_lacks Monosnap
     fi
     check "statusline script no longer points into the old repo" grep -q 'caveman_script="$HOME/.claude/plugins/' "$HOME/.claude/statusline-command.sh"
     check "Claude Code settings are byte-for-byte unchanged" same_file "$settings_before" "$HOME/.claude/settings.json"
