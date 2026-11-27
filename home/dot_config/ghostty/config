@@ -17,6 +17,8 @@ window-title-font-family = "Helvetica Neue"
 
 # Window/tab
 confirm-close-surface = true
+# Start in ~ even when launched at login, whose working directory is /
+working-directory = home
 #macos-titlebar-style = tabs
 
 # Miscellaneous
