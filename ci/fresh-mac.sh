@@ -46,6 +46,7 @@ check "CleanShot is not installed" none_installed cleanshot
 check "BetterTouchTool is not installed" none_installed bettertouchtool
 check "chezmoi reminds me to install BetterTouchTool" grep -q "Download BetterTouchTool" "$RUNNER_TEMP/init.log"
 check "chezmoi reminds me to install Monosnap" grep -q "Download Monosnap" "$RUNNER_TEMP/init.log"
+check "Ghostty starts new windows in ~" grep -qx 'working-directory = home' "$HOME/.config/ghostty/config"
 check "the existing Handy app was adopted" test -d /Applications/Handy.app
 check "Claude Code settings were created" grep -q '"model": "opus"' "$HOME/.claude/settings.json"
 check "Rectangle preferences were imported" defaults read com.knollsoft.Rectangle

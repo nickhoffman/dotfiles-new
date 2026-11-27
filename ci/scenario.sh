@@ -143,6 +143,7 @@ case "$scenario" in
     check "CleanShot is not in the Brewfile" bundle_lacks_cask cleanshot
     check "CleanShot preferences are not imported" prefs_script_lacks pl.maketheweb.cleanshotx
     check "BetterTouchTool is not in the Brewfile" bundle_lacks_cask bettertouchtool
+    check "Ghostty starts new windows in ~" grep -qx 'working-directory = home' "$HOME/.config/ghostty/config"
     if [[ $profile == personal ]]; then
       check "personal Mac apps are installed" casks_installed "${personal_casks[@]}"
       check "Homebrew's git is in the Brewfile" bundle_has_formula git
